@@ -1,5 +1,7 @@
 package com.mediapicker.gallery.presentation.adapters
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View

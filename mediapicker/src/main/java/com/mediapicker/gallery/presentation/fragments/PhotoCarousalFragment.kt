@@ -103,7 +103,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
                 onPermissionDenied = ::onPermissionDenied,
                 onNeverAskAgain = ::showNeverAskAgainPermission,
                 requiresPermission = ::checkPermissions,
-                onShowRationale = ::onShowRationale
+                onShowRationale = :: onShowRationale
             )
         }
     }
