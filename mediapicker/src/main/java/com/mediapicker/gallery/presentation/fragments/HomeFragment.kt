@@ -30,15 +30,12 @@ import java.io.Serializable
 
 open class HomeFragment : BaseFragment() {
     private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
-        Log.e("abhi_", ":granted  "+granted )
-       /* PermissionsUtil.handlePermissionsResult(
+        PermissionsUtil.handlePermissionsResult(
             requireActivity(),
             granted,
             onAllPermissionsGranted = { checkPermissions() },
             onPermissionDenied = { onPermissionDenied() }
-        )*/
-
-        checkPermissions()
+        )
     }
 
     private val homeViewModel: HomeViewModel by lazy {
