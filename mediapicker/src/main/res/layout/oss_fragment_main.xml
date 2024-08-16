@@ -1,37 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linear_layout_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/linear_layout_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabBackground="@android:color/white"
+        app:tabIndicatorColor="@color/primary"
+        app:tabSelectedTextColor="@color/primary"
+        app:tabTextColor="@color/oss_tab_text_color" />
+
+    <LinearLayout
+        android:id="@+id/permission_access_management"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tabLayout"
+        android:gravity="end">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/access_management"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:padding="4dp"
+            android:text="@string/request_partial_access" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/full_access_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/request_full_access" />
+    </LinearLayout>
+
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
+        android:layout_below="@id/permission_access_management"
         android:layout_weight="1">
-
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:tabIndicatorColor="@color/primary"
-            app:tabTextColor="@color/oss_tab_text_color"
-            app:tabBackground="@android:color/white"
-            app:tabSelectedTextColor="@color/primary"/>
 
     </androidx.viewpager.widget.ViewPager>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/action_button"
+        style="@style/OSS_CustomButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:animateLayoutChanges="true"
-        style="@style/OSS_CustomButton"
         android:enabled="true"
-        android:text="@string/oss_posting_next"
-        app:layout_constraintTop_toBottomOf="@id/ossRecycleView"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        android:text="@string/oss_posting_next" />
 
-</LinearLayout>
+</RelativeLayout>

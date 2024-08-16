@@ -8,13 +8,13 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.LinearLayout
-import androidx.lifecycle.Observer
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssFragmentCarousalBinding
-import com.mediapicker.gallery.databinding.OssFragmentMainBinding
 import com.mediapicker.gallery.domain.contract.GalleryPagerCommunicator
 import com.mediapicker.gallery.domain.entity.GalleryViewMediaType
 import com.mediapicker.gallery.domain.entity.MediaGalleryEntity
@@ -25,14 +25,13 @@ import com.mediapicker.gallery.presentation.adapters.PagerAdapter
 import com.mediapicker.gallery.presentation.carousalview.CarousalActionListener
 import com.mediapicker.gallery.presentation.carousalview.MediaGalleryView
 import com.mediapicker.gallery.presentation.utils.DefaultPage
+import com.mediapicker.gallery.presentation.utils.PermissionsUtil
 import com.mediapicker.gallery.presentation.utils.getActivityScopedViewModel
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.BridgeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.HomeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.gallery.utils.SnackbarUtils
-import permissions.dispatcher.ktx.PermissionsRequester
-import permissions.dispatcher.ktx.constructPermissionsRequest
 import java.io.Serializable
 import java.util.*
 
@@ -40,6 +39,15 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     MediaGalleryView.OnGalleryItemClickListener {
 
     private val PHOTO_PREVIEW = 43475
+
+    private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+        PermissionsUtil.handlePermissionsResult(
+            requireActivity(),
+            granted,
+            onAllPermissionsGranted = { checkPermissions() },
+            onPermissionDenied = { onPermissionDenied() }
+        )
+    }
 
     private val homeViewModel: HomeViewModel by lazy {
         getFragmentScopedViewModel { HomeViewModel(Gallery.galleryConfig) }
@@ -59,47 +67,12 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
         getPageFromArguments()
     }
 
-    private lateinit var permissionsRequester: PermissionsRequester
-
     private val ossFragmentCarousalBinding: OssFragmentCarousalBinding? by lazy {
         ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentCarousalBinding.bind(it) }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        permissionsRequester = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        } else {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        }
     }
 
 
@@ -124,8 +97,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
         ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
         ossFragmentCarousalBinding?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
         ossFragmentCarousalBinding?.actionButton?.text = Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
-
-        permissionsRequester.launch()
+        requestPermissions()
     }
 
     private fun checkPermissions() {
@@ -326,6 +298,11 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             ), mediaIndex, "", PHOTO_PREVIEW
         )
     }
+
+    private fun requestPermissions() {
+        PermissionsUtil.requestPermissions(requireActivity(), permissionLauncher)
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

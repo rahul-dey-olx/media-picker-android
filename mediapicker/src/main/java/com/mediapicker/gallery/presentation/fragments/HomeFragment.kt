@@ -4,8 +4,11 @@ import android.Manifest
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
@@ -15,17 +18,28 @@ import com.mediapicker.gallery.domain.entity.PhotoFile
 import com.mediapicker.gallery.presentation.activity.GalleryActivity
 import com.mediapicker.gallery.presentation.adapters.PagerAdapter
 import com.mediapicker.gallery.presentation.utils.DefaultPage
+import com.mediapicker.gallery.presentation.utils.PermissionsUtil
+import com.mediapicker.gallery.presentation.utils.PermissionsUtil.openAppSettings
 import com.mediapicker.gallery.presentation.utils.getActivityScopedViewModel
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.BridgeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.HomeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.gallery.utils.SnackbarUtils
-import permissions.dispatcher.ktx.PermissionsRequester
-import permissions.dispatcher.ktx.constructPermissionsRequest
 import java.io.Serializable
 
 open class HomeFragment : BaseFragment() {
+    private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+        Log.e("abhi_", ":granted  "+granted )
+       /* PermissionsUtil.handlePermissionsResult(
+            requireActivity(),
+            granted,
+            onAllPermissionsGranted = { checkPermissions() },
+            onPermissionDenied = { onPermissionDenied() }
+        )*/
+
+        checkPermissions()
+    }
 
     private val homeViewModel: HomeViewModel by lazy {
         getFragmentScopedViewModel { HomeViewModel(Gallery.galleryConfig) }
@@ -45,49 +59,13 @@ open class HomeFragment : BaseFragment() {
         getPageFromArguments()
     }
 
-    private lateinit var permissionsRequester: PermissionsRequester
-
     private val ossFragmentMainBinding: OssFragmentMainBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentMainBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<RelativeLayout>(R.id.linear_layout_parent)?.let { OssFragmentMainBinding.bind(it) }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        permissionsRequester = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU && Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        } else {
-            constructPermissionsRequest(
-                permissions = arrayOf(
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ),
-                onPermissionDenied = ::onPermissionDenied,
-                onNeverAskAgain = ::showNeverAskAgainPermission,
-                requiresPermission = ::checkPermissions
-            )
-        }
     }
-
 
     override fun getLayoutId() = R.layout.oss_fragment_main
 
@@ -95,8 +73,14 @@ open class HomeFragment : BaseFragment() {
 
     override fun setUpViews() {
         ossFragmentMainBinding?.actionButton?.text = Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+        requestPermissions()
 
-        permissionsRequester.launch()
+        ossFragmentMainBinding?.fullAccessButton?.setOnClickListener {
+            activity?.let { it1 -> openAppSettings(it1) }
+        }
+        ossFragmentMainBinding?.accessManagement?.setOnClickListener {
+            requestPermissions()
+        }
     }
 
     fun checkPermissions() {
@@ -219,6 +203,10 @@ open class HomeFragment : BaseFragment() {
 
     fun reloadMedia() {
         bridgeViewModel.reloadMedia()
+    }
+
+    private fun requestPermissions() {
+        PermissionsUtil.requestPermissions(requireActivity(), permissionLauncher)
     }
 
     companion object {
