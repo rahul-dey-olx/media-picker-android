@@ -5,7 +5,7 @@ By default it scan all the photos and videos in the device also you can provide 
 
 # Download
 
-[![](https://jitpack.io/v/olxgroup-oss/media-picker-android.svg)](https://jitpack.io/#olxgroup-oss/media-picker-android)
+[![](https://jitpack.io/v/IndiaOlx/media-picker-android.svg)](https://jitpack.io/#IndiaOlx/media-picker-android)
 
 
 Add it in your root build.gradle at the end of repositories
