@@ -91,7 +91,7 @@ class InValidPhotoException(message: String) : Throwable(message)
 class MimeTypeNotSupportedException(message: String) : Throwable(message)
 
 sealed class ValidationResult {
-    object Success : ValidationResult()
+    data object Success : ValidationResult()
 
     class Failure(val msg: String) : ValidationResult()
 }

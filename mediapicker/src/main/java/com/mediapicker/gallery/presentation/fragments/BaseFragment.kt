@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.annotation.LayoutRes
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssFragmentBaseBinding
@@ -55,7 +56,7 @@ abstract class BaseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         ossFragmentBaseBinding = OssFragmentBaseBinding.inflate(inflater, container, false).apply {
-            childView = inflater.inflate(getLayoutId(),null)
+            childView = inflater.inflate(getLayoutId(), null)
 
             baseContainer.addView(childView)
         }
@@ -75,11 +76,19 @@ abstract class BaseFragment : Fragment() {
     @CallSuper
     private fun setToolbar() {
         ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.text = getScreenTitle()
-        context?.resources?.getColor(R.color.oss_toolbar_text)
-            ?.let { ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.setTextColor(it) }
+        context?.let {
+            ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.setTextColor(
+                ContextCompat.getColor(
+                    it,
+                    R.color.oss_toolbar_text
+                )
+            )
+        }
         if (setHomeAsUp()) {
             ossFragmentBaseBinding?.ossCustomTool?.toolbarBackButton?.visibility = View.VISIBLE
-            ossFragmentBaseBinding?.ossCustomTool?.toolbarBackButton?.setImageResource(getHomeAsUpIcon())
+            ossFragmentBaseBinding?.ossCustomTool?.toolbarBackButton?.setImageResource(
+                getHomeAsUpIcon()
+            )
         } else {
             ossFragmentBaseBinding?.ossCustomTool?.toolbarBackButton?.visibility = View.GONE
         }

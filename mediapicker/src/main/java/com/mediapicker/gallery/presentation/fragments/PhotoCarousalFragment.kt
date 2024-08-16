@@ -9,16 +9,13 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatButton
-import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayout
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssFragmentCarousalBinding
-import com.mediapicker.gallery.databinding.OssFragmentMainBinding
 import com.mediapicker.gallery.domain.contract.GalleryPagerCommunicator
 import com.mediapicker.gallery.domain.entity.GalleryViewMediaType
 import com.mediapicker.gallery.domain.entity.MediaGalleryEntity
@@ -36,15 +33,16 @@ import com.mediapicker.gallery.presentation.viewmodels.BridgeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.HomeViewModel
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.gallery.utils.SnackbarUtils
+import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
 import java.io.Serializable
 
+private const val PHOTO_PREVIEW = 43475
 
 open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     MediaGalleryView.OnGalleryItemClickListener {
 
-    private val PHOTO_PREVIEW = 43475
 
     private lateinit var mediaGalleryView: MediaGalleryView
     private lateinit var actionButton: AppCompatButton
@@ -72,7 +70,8 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     private lateinit var permissionsRequester: PermissionsRequester
 
     private val ossFragmentCarousalBinding: OssFragmentCarousalBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentCarousalBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)
+            ?.let { OssFragmentCarousalBinding.bind(it) }
     }
 
     override fun onAttach(context: Context) {
@@ -110,7 +109,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
                 onPermissionDenied = ::onPermissionDenied,
                 onNeverAskAgain = ::showNeverAskAgainPermission,
                 requiresPermission = ::checkPermissions,
-                onShowRationale = :: onShowRationale
+                onShowRationale = ::onShowRationale
             )
         }
     }
@@ -123,7 +122,8 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
 
     override fun getLayoutId() = R.layout.oss_fragment_carousal
 
-    override fun getScreenTitle() = Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
+    override fun getScreenTitle() =
+        Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
 
     override fun setUpViews() {
         Gallery.pagerCommunicator = this
@@ -139,13 +139,14 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             }
         }
 
-        ossFragmentCarousalBinding?.actionButton?.text = if (Gallery.galleryConfig.galleryLabels.homeAction.isNotBlank())
-            Gallery.galleryConfig.galleryLabels.homeAction
-        else
-            getString(R.string.oss_posting_next)
+        ossFragmentCarousalBinding?.actionButton?.text =
+            if (Gallery.galleryConfig.galleryLabels.homeAction.isNotBlank())
+                Gallery.galleryConfig.galleryLabels.homeAction
+            else
+                getString(R.string.oss_posting_next)
         ossFragmentCarousalBinding?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
 
-        ossFragmentBaseBinding?.customToolbar.apply {
+        ossFragmentBaseBinding?.ossCustomTool?.apply {
             toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
             toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
             toolbarBackButton.setImageResource(Gallery.galleryConfig.galleryUiConfig.backIcon)
@@ -175,7 +176,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
                 }
             }
             openPage()
-        ossFragmentCarousalBinding?.actionButton?.apply {
+            ossFragmentCarousalBinding?.actionButton?.apply {
                 isSelected = false
                 setOnClickListener { onActionButtonClicked() }
             }
@@ -246,7 +247,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             childFragmentManager,
             listOf(
                 PhotoGridFragment.getInstance(
-                    getString(com.mediapicker.gallery.R.string.oss_title_tab_photo),
+                    getString(R.string.oss_title_tab_photo),
                     getPhotosFromArguments()
                 )
             )
@@ -371,7 +372,9 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
 
     override fun onPreviewItemsUpdated(listOfSelectedPhotos: List<PhotoFile>) {
         if (Gallery.galleryConfig.showPreviewCarousal.addImage) {
-            ossFragmentCarousalBinding?.mediaGalleryView?.setImagesForPager(convertPhotoFileToMediaGallery(listOfSelectedPhotos))
+            ossFragmentCarousalBinding?.mediaGalleryView?.setImagesForPager(
+                convertPhotoFileToMediaGallery(listOfSelectedPhotos)
+            )
         }
     }
 

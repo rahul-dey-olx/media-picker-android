@@ -1,7 +1,6 @@
 package com.mediapicker.sample
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -9,7 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.domain.contract.IGalleryCommunicator
-import com.mediapicker.gallery.domain.entity.*
+import com.mediapicker.gallery.domain.entity.CarousalConfig
+import com.mediapicker.gallery.domain.entity.PhotoFile
+import com.mediapicker.gallery.domain.entity.PhotoTag
+import com.mediapicker.gallery.domain.entity.Rule
+import com.mediapicker.gallery.domain.entity.Validation
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
@@ -17,10 +20,10 @@ import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
 import java.io.File
 
+private const val REQUEST_VIDEO_CAPTURE: Int = 1000
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_VIDEO_CAPTURE: Int = 1000
     private var fragment: HomeFragment? = null
     private val activityMainBinding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -33,11 +36,6 @@ class MainActivity : AppCompatActivity() {
         showStepFragment()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-//        _binding = null
-    }
-
     private fun getValidation(): Validation {
         return Validation.ValidationBuilder()
             .setMinPhotoSelection(Rule.MinPhotoSelection(1, "Minimum 1 photos can be selected "))
@@ -45,15 +43,19 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
-    private fun setUpGallery(){
-        val galleryConfig = GalleryConfig.GalleryConfigBuilder(applicationContext, BuildConfig.APPLICATION_ID + ".provider", MyClientGalleryCommunicator())
+    private fun setUpGallery() {
+        val galleryConfig = GalleryConfig.GalleryConfigBuilder(
+            applicationContext,
+            BuildConfig.APPLICATION_ID + ".provider",
+            MyClientGalleryCommunicator()
+        )
             .useMyPhotoCamera(true)
             .useMyVideoCamera(false)
             .needToShowPreviewCarousal(CarousalConfig(true, 0, true, 0))
-            .mediaScanningCriteria(GalleryConfig.MediaScanningCriteria("",""))
+            .mediaScanningCriteria(GalleryConfig.MediaScanningCriteria("", ""))
             .typeOfMediaSupported(GalleryConfig.MediaType.PhotoWithFolderAndVideo)
             .validation(getValidation())
-            .photoTag( PhotoTag(true,"RC photo"))
+            .photoTag(PhotoTag(true, "RC photo"))
             .build()
         Gallery.init(galleryConfig)
     }
@@ -61,8 +63,9 @@ class MainActivity : AppCompatActivity() {
     private fun attachGalleryFragment() {
         try {
             val transaction = supportFragmentManager.beginTransaction()
-            val  photos =  SelectedItemHolder.listOfSelectedPhotos
-            fragment = DemoHomeFragment.getInstance(photos,
+            val photos = SelectedItemHolder.listOfSelectedPhotos
+            fragment = DemoHomeFragment.getInstance(
+                photos,
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
             )
@@ -77,9 +80,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun jumpToGallery() {
-       /* startActivity(GalleryActivity.getGalleryActivityIntent(SelectedItemHolder.listOfSelectedPhotos,
-            SelectedItemHolder.listOfSelectedVideos,
-            defaultPageType = DefaultPage.PhotoPage,context = baseContext))*/
+        /* startActivity(GalleryActivity.getGalleryActivityIntent(SelectedItemHolder.listOfSelectedPhotos,
+             SelectedItemHolder.listOfSelectedVideos,
+             defaultPageType = DefaultPage.PhotoPage,context = baseContext))*/
         attachGalleryFragment()
     }
 
@@ -87,7 +90,11 @@ class MainActivity : AppCompatActivity() {
         try {
             val transaction = supportFragmentManager.beginTransaction()
             val fragment = StepFragment()
-            transaction.replace(activityMainBinding.container.id, fragment, fragment::class.java.simpleName)
+            transaction.replace(
+                activityMainBinding.container.id,
+                fragment,
+                fragment::class.java.simpleName
+            )
             transaction.commitAllowingStateLoss()
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -100,7 +107,10 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        override fun actionButtonClick(listOfSelectedPhotos: List<PhotoFile>, listofSelectedVideos: List<VideoFile>) {
+        override fun actionButtonClick(
+            listOfSelectedPhotos: List<PhotoFile>,
+            listofSelectedVideos: List<VideoFile>
+        ) {
             SelectedItemHolder.listOfSelectedPhotos = listOfSelectedPhotos.toMutableList()
             SelectedItemHolder.listOfSelectedVideos = listofSelectedVideos
             showStepFragment()
@@ -127,20 +137,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         private fun showMessage(msg: String) {
-             Toast.makeText(applicationContext,msg,Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
 
         }
 
         override fun onPermissionDenied() {
-            Toast.makeText(applicationContext,"Permission denied :(",Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Permission denied :(", Toast.LENGTH_LONG).show()
         }
 
         override fun onNeverAskPermissionAgain() {
-            Toast.makeText(applicationContext,"Permission denied :(",Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Permission denied :(", Toast.LENGTH_LONG).show()
         }
 
         override fun onShowPermissionRationale(permissionRequest: PermissionRequestWrapper) {
-            Toast.makeText(applicationContext,"Permission show rationale :|",Toast.LENGTH_LONG).show()
+            Toast.makeText(applicationContext, "Permission show rationale :|", Toast.LENGTH_LONG)
+                .show()
         }
 
         override fun onStepValidate(isValid: Boolean) {
@@ -159,7 +170,6 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
-            val videoUri: Uri? = intent.data
             Toast.makeText(baseContext, "Recorded ", Toast.LENGTH_LONG).show()
             fragment?.reloadMedia()
         }
@@ -178,11 +188,11 @@ object SelectedItemHolder {
 //        builder.fullPhotoUrl("https://www.hackingwithswift.com/uploads/matrix.jpg")
 //        this.add(builder.build())
 
-     /*   val builder1 = PhotoFile.Builder()
-        builder1.apolloKey = "11112"
-        builder1.imageId = 20
-        builder1.fullPhotoUrl("https://www.hackingwithswift.com/uploads/matrix.jpg")
-        this.add(builder1.build())*/
+    /*   val builder1 = PhotoFile.Builder()
+       builder1.apolloKey = "11112"
+       builder1.imageId = 20
+       builder1.fullPhotoUrl("https://www.hackingwithswift.com/uploads/matrix.jpg")
+       this.add(builder1.build())*/
 //    }
     var listOfSelectedVideos = emptyList<VideoFile>()
 }

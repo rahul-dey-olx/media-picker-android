@@ -1,7 +1,5 @@
 package com.mediapicker.gallery.presentation.adapters
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +14,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
-import com.mediapicker.gallery.databinding.OssItemCameraSelectionBinding
-import com.mediapicker.gallery.databinding.OssItemPhotoSelectionBinding
-import com.mediapicker.gallery.databinding.OssItemVideoSelectionBinding
-import com.mediapicker.gallery.domain.entity.*
 import com.mediapicker.gallery.databinding.OssItemCameraSelectionBinding
 import com.mediapicker.gallery.databinding.OssItemPhotoSelectionBinding
 import com.mediapicker.gallery.domain.entity.Action
@@ -56,10 +50,18 @@ class SelectPhotoImageAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return if (viewType == ITEM_TYPE_CAMERA || viewType == ITEM_TYPE_ALBUM) {
-            val binding: OssItemCameraSelectionBinding = OssItemCameraSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val binding: OssItemCameraSelectionBinding = OssItemCameraSelectionBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
             CameraViewHolder(binding)
         } else {
-            val binding: OssItemPhotoSelectionBinding = OssItemPhotoSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val binding: OssItemPhotoSelectionBinding = OssItemPhotoSelectionBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
             PhotoViewHolder(binding)
         }
     }
@@ -91,12 +93,13 @@ class SelectPhotoImageAdapter(
                     )
                 )
 
-                cameraViewHolder.itemView.setOnClickListener { v -> onClickCamera() }
+                cameraViewHolder.itemView.setOnClickListener { onClickCamera() }
                 cameraViewHolder.binding.folderName.isAllCaps = Gallery.galleryConfig.textAllCaps
                 cameraViewHolder.binding.folderName.text =
                     viewHolder.itemView.context.getString(R.string.oss_label_camera)
                 cameraViewHolder.binding.img.setImageResource(uiConfig.cameraIcon)
             }
+
             ITEM_TYPE_ALBUM -> {
                 val cameraViewHolder = viewHolder as CameraViewHolder
                 val uiConfig = Gallery.galleryConfig.galleryUiConfig
@@ -109,7 +112,7 @@ class SelectPhotoImageAdapter(
                     )
                 )
 
-                cameraViewHolder.itemView.setOnClickListener { v -> onGalleryItemClickListener.onFolderItemClick() }
+                cameraViewHolder.itemView.setOnClickListener { onGalleryItemClickListener.onFolderItemClick() }
                 cameraViewHolder.binding.folderName.isAllCaps = Gallery.galleryConfig.textAllCaps
                 cameraViewHolder.binding.folderName.text =
                     viewHolder.itemView.context.getString(R.string.oss_label_folder)
@@ -125,20 +128,23 @@ class SelectPhotoImageAdapter(
                     photoViewHolder.binding.imgSelectedText.text =
                         getPosition(photoViewHolder.photoFile).toString()
                     photoViewHolder.binding.imgSelectedText.background =
-                        photoViewHolder.itemView.context
-                            .resources.getDrawable(R.drawable.oss_circle_photo_indicator_selected)
+                        ContextCompat.getDrawable(
+                            photoViewHolder.itemView.context,
+                            R.drawable.oss_circle_photo_indicator_selected
+                        )
                     photoViewHolder.itemView.scaleX = AnimationHelper.SELECTED_SCALE
                     photoViewHolder.itemView.scaleY = AnimationHelper.SELECTED_SCALE
                     setSelectedPhoto(photoViewHolder)
                 } else {
                     photoViewHolder.binding.imgSelectedText.text = ""
                     photoViewHolder.binding.imgSelectedText.background =
-                        photoViewHolder.itemView.context
-                            .resources.getDrawable(R.drawable.oss_circle_photo_indicator)
+                        ContextCompat.getDrawable(
+                            photoViewHolder.itemView.context,
+                            R.drawable.oss_circle_photo_indicator
+                        )
                     photoViewHolder.binding.whiteOverlay.visibility = View.GONE
                     photoViewHolder.itemView.scaleX = AnimationHelper.UNSELECTED_SCALE
                     photoViewHolder.itemView.scaleY = AnimationHelper.UNSELECTED_SCALE
-
                 }
                 if (photoViewHolder.photoFile.imageId != photoViewHolder.itemView.tag) {
                     loadImageIntoView(
@@ -147,7 +153,7 @@ class SelectPhotoImageAdapter(
                     )
                     photoViewHolder.itemView.tag = photoViewHolder.photoFile.imageId
                 }
-                photoViewHolder.itemView.setOnClickListener { v ->
+                photoViewHolder.itemView.setOnClickListener {
                     val path = photoViewHolder.photoFile.path
                     val imageId = photoViewHolder.photoFile.imageId
                     val fullPhotoUrl = photoViewHolder.photoFile.fullPhotoUrl
@@ -173,7 +179,8 @@ class SelectPhotoImageAdapter(
             photoViewHolder.binding.imgCoverText.text = Gallery.galleryConfig.photoTag.photoTagText
         } else if (listCurrentPhotos.indexOf(photoViewHolder.photoFile) == 0 && Gallery.galleryConfig.needToShowCover.shouldShowPhotoTag) {
             photoViewHolder.binding.imgCoverText.visibility = View.VISIBLE
-            photoViewHolder.binding.imgCoverText.text = Gallery.galleryConfig.needToShowCover.photoTagText
+            photoViewHolder.binding.imgCoverText.text =
+                Gallery.galleryConfig.needToShowCover.photoTagText
         } else {
             photoViewHolder.binding.imgCoverText.visibility = View.GONE
         }
@@ -201,20 +208,23 @@ class SelectPhotoImageAdapter(
                 .apply(options)
                 .into(imageView)
         } else if (!photoFile.path.isNullOrEmpty()) {
-            Glide.with(imageView.context)
-                .load(Uri.fromFile(File(photoFile.path!!)))
-                .thumbnail(0.1f)
-                .apply(options)
-                .into(imageView)
+            photoFile.path?.let {
+                Glide.with(imageView.context)
+                    .load(Uri.fromFile(File(it)))
+//                    .thumbnail(0.1f)
+                    .apply(options)
+                    .into(imageView)
+            }
         }
     }
 }
 
 
-internal class CameraViewHolder(var binding: OssItemCameraSelectionBinding) : ViewHolder(binding.root) {
-}
+internal class CameraViewHolder(var binding: OssItemCameraSelectionBinding) :
+    ViewHolder(binding.root)
 
-internal class PhotoViewHolder(var binding: OssItemPhotoSelectionBinding) : ViewHolder(binding.root) {
+internal class PhotoViewHolder(var binding: OssItemPhotoSelectionBinding) :
+    ViewHolder(binding.root) {
     lateinit var photoFile: PhotoFile
 
 }

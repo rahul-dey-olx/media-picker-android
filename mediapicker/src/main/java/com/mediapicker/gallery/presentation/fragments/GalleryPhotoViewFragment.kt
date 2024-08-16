@@ -3,10 +3,7 @@ package com.mediapicker.gallery.presentation.fragments
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.LinearLayout
-import android.view.View
-import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
@@ -39,10 +36,11 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     }
 
     private val ossFragmentFolderView: OssFragmentFolderViewBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentFolderViewBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)
+            ?.let { OssFragmentFolderViewBinding.bind(it) }
     }
 
-    private fun removePhotoFromSelection(photo: PhotoFile, position: Int) {
+    private fun removePhotoFromSelection(photo: PhotoFile) {
         currentSelectedPhotos.removePhoto(photo)
         Gallery.carousalActionListener?.onItemClicked(photo, false)
         adapter.listCurrentPhotos = currentSelectedPhotos.toList()
@@ -81,9 +79,11 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
         }
 
         if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
-            ossFragmentFolderView?.actionButton?.text = Gallery.galleryConfig.galleryLabels.galleryFolderAction
+            ossFragmentFolderView?.actionButton?.text =
+                Gallery.galleryConfig.galleryLabels.galleryFolderAction
         }
-        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
+        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps =
+            Gallery.galleryConfig.textAllCaps
         ossFragmentFolderView?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
 
 //        baseBinding.customToolbar.apply {
@@ -95,13 +95,13 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     @SuppressLint("CheckResult")
     private fun handleItemClickListener(photo: PhotoFile, position: Int) {
         if (currentSelectedPhotos.containsPhoto(photo)) {
-            removePhotoFromSelection(photo, position)
+            removePhotoFromSelection(photo)
         } else {
-            validateNewPhoto(photo, position)
+            validateNewPhoto(photo)
         }
     }
 
-    private fun validateNewPhoto(photo: PhotoFile, position: Int) {
+    private fun validateNewPhoto(photo: PhotoFile) {
         when (val validationResult =
             photoValidationAction.canAddThisToList(currentSelectedPhotos.size, photo)) {
             is ValidationResult.Success -> {

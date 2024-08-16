@@ -6,8 +6,8 @@ import com.mediapicker.gallery.domain.contract.GalleryCommunicatorDefaultImpl
 import com.mediapicker.gallery.domain.contract.IGalleryCommunicator
 import com.mediapicker.gallery.domain.entity.CarousalConfig
 import com.mediapicker.gallery.domain.entity.GalleryLabels
-import com.mediapicker.gallery.domain.entity.PhotoTag
 import com.mediapicker.gallery.domain.entity.GalleryUIConfig
+import com.mediapicker.gallery.domain.entity.PhotoTag
 import com.mediapicker.gallery.domain.entity.Validation
 
 class GalleryConfig(
@@ -102,11 +102,11 @@ class GalleryConfig(
     }
 
     sealed class MediaType {
-        object PhotoOnly : MediaType()
-        object PhotoWithVideo : MediaType()
-        object PhotoWithFolderAndVideo : MediaType()
-        object PhotoWithFolderOnly : MediaType()
-        object PhotoWithoutCameraFolderOnly : MediaType()
+        data object PhotoOnly : MediaType()
+        data object PhotoWithVideo : MediaType()
+        data object PhotoWithFolderAndVideo : MediaType()
+        data object PhotoWithFolderOnly : MediaType()
+        data object PhotoWithoutCameraFolderOnly : MediaType()
     }
 
     data class MediaScanningCriteria(val photoBrowseQuery: String = "", val videoBrowseQuery: String = "") {

@@ -10,7 +10,6 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.domain.entity.PhotoFile
@@ -25,6 +24,7 @@ import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModel
 import java.io.Serializable
 
+private const val TAKING_PHOTO = 9999
 
 open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
@@ -45,7 +45,6 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     private var isSingleSelectionMode = false
     private var numberOfPhotosBeforeCapture: Int = 0
-    private val TAKING_PHOTO = 9999
     private var numberOfPhoto = 0
 
 
@@ -143,7 +142,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     protected fun handleItemClick(photo: PhotoFile): Boolean {
         if (isSingleSelectionMode) {
-            onImageAdded("", photo)
+            onImageAdded(photo)
             galleryItemAdapter.notifyDataSetChanged()
             return true
         } else if (checkIfAlreadySelected(photo)) {
@@ -152,7 +151,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             onStepValidate()
             return true
         } else if (currentSelectedPhotos.size < bridgeViewModel.getMaxSelectionLimit()) {
-            if (onImageValidate("", photo) && onImageAdded("", photo)) {
+            if (onImageValidate(photo) && onImageAdded(photo)) {
                 addNewPhotoToCurrentSelection(photo, getPosition(photo))
                 onStepValidate()
                 return true
@@ -236,7 +235,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     }
 
-    private fun onImageAdded(fragmentName: String, photo: PhotoFile): Boolean {
+    private fun onImageAdded(photo: PhotoFile): Boolean {
         addItem(photo)
         Gallery.pagerCommunicator?.onItemClicked(photo, true)
         Gallery.carousalActionListener?.onItemClicked(photo, true)
@@ -244,11 +243,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return true
     }
 
-    fun onImageRemoved(fragmentName: String, photo: PhotoFile): Boolean {
-        return true
-    }
+//    fun onImageRemoved(fragmentName: String, photo: PhotoFile): Boolean {
+//        return true
+//    }
 
-    fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
+    fun onImageValidate(photo: PhotoFile): Boolean {
         val rule = photoValidationAction.complyRulesImages(photo.path)
         var isValid = true
         if (rule != null) {
@@ -269,9 +268,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == PHOTO_SELECTION_REQUEST_CODE) run {
-            val finalSelectionFromFolders =
-                data?.getSerializableExtra(EXTRA_SELECTED_PHOTO) as LinkedHashSet<PhotoFile>
-            setSelectedFromFolderAndNotify(finalSelectionFromFolders)
+            val finalSelectionFromFolders: LinkedHashSet<*> =
+                data?.getSerializableExtra(EXTRA_SELECTED_PHOTO) as LinkedHashSet<*>
+            val photoFileSet: LinkedHashSet<PhotoFile> =
+                LinkedHashSet(finalSelectionFromFolders.filterIsInstance<PhotoFile>())
+            setSelectedFromFolderAndNotify(photoFileSet)
         } else if (requestCode == TAKING_PHOTO) {
             if (resultCode == Activity.RESULT_OK) {
                 if (lastRequestFileToSavePath.isNotEmpty()) {

@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -18,12 +19,11 @@ import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
 import com.github.chrisbanes.photoview.PhotoViewAttacher
-import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssMediaGalleryPagerViewBinding
 import com.mediapicker.gallery.domain.entity.MediaGalleryEntity
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.util.*
+import java.util.Locale
 import kotlin.math.floor
 
 open class MediaGalleryPagerView @JvmOverloads constructor(
@@ -39,8 +39,6 @@ open class MediaGalleryPagerView @JvmOverloads constructor(
     private var pinchPanZoomEnabled = false
     private var isGallery = false
     private var mediaChangeListener: MediaChangeListener? = null
-    private var _binding: OssMediaGalleryPagerViewBinding? = null
-    private val binding get() = _binding!!
 
     val binding: OssMediaGalleryPagerViewBinding by lazy {
         OssMediaGalleryPagerViewBinding.inflate(LayoutInflater.from(context), this)
@@ -239,7 +237,7 @@ open class MediaGalleryPagerView @JvmOverloads constructor(
                 return POSITION_NONE
             }
 
-            val item = (`object` as View).tag as MediaGalleryEntity
+            val item = `object`.tag as MediaGalleryEntity
             val position: Int = mediaList.indexOf(item)
             return if (position >= 0) {
                 position

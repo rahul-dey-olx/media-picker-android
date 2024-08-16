@@ -16,9 +16,6 @@ import com.mediapicker.gallery.presentation.carousalview.MediaGalleryPagerView
 class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
     MediaGalleryPagerView.MediaChangeListener {
 
-    private var _binding: OssMediaGalleryActivityBinding? = null
-    private val binding get() = _binding!!
-
     private var origin = ""
     private var selectedPhotoIndex = 0
     private var mediaGalleryList: MutableList<MediaGalleryEntity> = mutableListOf()
@@ -70,10 +67,10 @@ class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        _binding = null
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+////        binding = null
+//    }
 
     private fun loadImagesInGallery(imageList: MutableList<MediaGalleryEntity>) {
         binding.imagePager.apply {

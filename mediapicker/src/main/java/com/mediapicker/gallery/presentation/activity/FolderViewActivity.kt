@@ -99,7 +99,7 @@ class FolderViewActivity : BaseFragmentActivity(), GalleryActionListener {
                 fragments > 1 -> supportFragmentManager.popBackStack()
                 else -> {
                     isEnabled = false
-                    onBackPressedDispatcher.onBackPressed();
+                    onBackPressedDispatcher.onBackPressed()
                     isEnabled = true
                 }
             }
