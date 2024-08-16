@@ -63,14 +63,14 @@ class PhotoFile : Serializable, IGalleryItem {
         return existPhoto
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) return true
-        if (o == null || javaClass != o.javaClass) return false
-        val that = o as PhotoFile?
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val that = other as PhotoFile?
         if(this.imageId == 0L || that!!.imageId == 0L){
             return this.path == that!!.path
         }
-        return this.imageId == that!!.imageId
+        return this.imageId == that.imageId
     }
 
     override fun hashCode(): Int {

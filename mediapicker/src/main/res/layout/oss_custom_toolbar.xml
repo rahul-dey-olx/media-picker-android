@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/toolbarView"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:layout_alignParentTop="true"
@@ -10,7 +9,7 @@
     android:theme="@style/CustomActionBar">
 
     <ImageView
-        android:id="@+id/toolbarBackButton"
+        android:id="@+id/toolbar_back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
@@ -20,14 +19,14 @@
         android:layout_marginLeft="12dp" />
 
     <TextView
-        android:id="@+id/toolbarTitle"
+        android:id="@+id/toolbar_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginStart="28dp"
         android:layout_marginLeft="28dp"
-        android:layout_toEndOf="@id/toolbarBackButton"
-        android:layout_toRightOf="@id/toolbarBackButton"
+        android:layout_toEndOf="@id/toolbar_back_button"
+        android:layout_toRightOf="@id/toolbar_back_button"
         android:textAllCaps="true"
         android:textColor="@android:color/black"
         android:textSize="20sp"

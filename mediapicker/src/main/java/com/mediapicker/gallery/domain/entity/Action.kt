@@ -12,7 +12,7 @@ enum class Action private constructor(name: String) {
 
     companion object {
         fun fromName(name: String): Action? {
-            for (type in Action.values()) {
+            for (type in entries) {
                 if (type.name == name) {
                     return type
                 }

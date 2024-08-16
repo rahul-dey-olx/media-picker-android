@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.lifecycle.Observer
 import com.mediapicker.gallery.Gallery
@@ -41,7 +43,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
     private var isSingleSelectionMode = false
     private var numberOfPhotosBeforeCapture: Int = 0
     private val TAKING_PHOTO = 9999
-    protected var numberOfPhoto = 0
+    private var numberOfPhoto = 0
 
 
     private var isExpectingNewPhoto: Boolean = false
@@ -80,17 +82,17 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         for (listCurrentPhoto in listCurrentPhotos) {
             loadPhotoViewModel.currentSelectedPhotos.add(listCurrentPhoto)
         }
-        loadPhotoViewModel.getGalleryItems().observe(this, Observer {
+        loadPhotoViewModel.getGalleryItems().observe(this) {
             galleryItemAdapter.updateGalleryItems(it)
             onStepValidate()
-        })
+        }
         loadPhotoViewModel.loadMedia(this)
     }
 
     private val galleryItemSelectHandler = object :
         IGalleryItemClickListener {
-        override fun onPhotoItemClick(photo: PhotoFile, position: Int) {
-            if (handleItemClick(photo)) {
+        override fun onPhotoItemClick(photoFile: PhotoFile, position: Int) {
+            if (handleItemClick(photoFile)) {
                 updateData(position)
             }
         }
@@ -118,7 +120,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             Uri.fromFile(lastRequestFileToSave)
         } else {
             FileProvider.getUriForFile(
-                context!!,
+                requireContext(),
                 Gallery.getClientAuthority(),
                 lastRequestFileToSave
             )
@@ -231,7 +233,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     }
 
-    fun onImageAdded(fragmentName: String, photo: PhotoFile): Boolean {
+    private fun onImageAdded(fragmentName: String, photo: PhotoFile): Boolean {
         addItem(photo)
         Gallery.pagerCommunicator?.onItemClicked(photo, true)
         Gallery.carousalActionListener?.onItemClicked(photo, true)
@@ -243,11 +245,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return true
     }
 
-    fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
+    private fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
         return true
     }
 
-    fun addItem(photo: PhotoFile) {
+    private fun addItem(photo: PhotoFile) {
         currentSelectedPhotos.add(photo)
         listCurrentPhotos.add(photo)
     }
@@ -274,12 +276,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
     }
 
     private fun getPhoto(path: String): PhotoFile {
-        var fullPhotoUrl = ""
         return PhotoFile.Builder()
             .imageId(0)
             .path(path)
             .smallPhotoUrl("")
-            .fullPhotoUrl(fullPhotoUrl)
+            .fullPhotoUrl("")
             .photoBackendId(0L)
             .build()
     }
@@ -287,7 +288,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
     private fun insertIntoGallery() {
         val values = ContentValues().apply {
             put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
                 put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis())
                 put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
                 put(MediaStore.Images.Media.IS_PENDING, 1)
@@ -295,7 +296,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
                 put(MediaStore.MediaColumns.DATA, lastRequestFileToSavePath)
             }
         }
-        if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
             addImageIntoGalleryQAndAboveDevices(values)
         } else {
             addImageIntoGalleryBelowQDevices(values)
@@ -307,6 +308,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun addImageIntoGalleryQAndAboveDevices(values: ContentValues) {
         val collection =
             MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
