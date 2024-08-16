@@ -1,10 +1,10 @@
 package com.mediapicker.gallery.domain.entity
 
-enum class Action private constructor(name: String) {
-    NONE("NONE"),
-    ADD("ADD"),
-    EDIT("EDIT"),
-    REMOVE("REMOVE");
+enum class Action {
+    NONE,
+    ADD,
+    EDIT,
+    REMOVE;
 
     override fun toString(): String {
         return name

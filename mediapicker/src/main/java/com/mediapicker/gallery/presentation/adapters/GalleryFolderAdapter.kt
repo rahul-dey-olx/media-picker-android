@@ -29,7 +29,6 @@ open class GalleryFolderAdapter(
             parent,
             false
         )
-//        val view = LayoutInflater.from(parent.context).inflate(R.layout.oss_item_folder_selection, parent, false)
         return FolderViewHolder(binding, onItemClickListener)
     }
 

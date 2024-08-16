@@ -27,10 +27,18 @@ class SelectVideoAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return if (viewType == ITEM_TYPE_RECORD_VIDEO) {
-            val binding: OssItemCameraSelectionBinding = OssItemCameraSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val binding: OssItemCameraSelectionBinding = OssItemCameraSelectionBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
             RecordVideoViewHolder(binding)
         } else {
-            val binding: OssItemVideoSelectionBinding = OssItemVideoSelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            val binding: OssItemVideoSelectionBinding = OssItemVideoSelectionBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
             VideoViewHolder(
                 binding
             )
@@ -54,6 +62,7 @@ class SelectVideoAdapter(
                     context.getString(R.string.oss_label_record_video)
                 recordVH.itemView.setOnClickListener { onItemClickListener?.recordVideo() }
             }
+
             ITEM_TYPE_VIDEO -> {
                 val videoVH = viewHolder as VideoViewHolder
                 videoVH.itemView.setOnClickListener {
@@ -82,16 +91,15 @@ interface OnItemClickListener {
 }
 
 
-internal class RecordVideoViewHolder(val binding: OssItemCameraSelectionBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(){}
+internal class RecordVideoViewHolder(val binding: OssItemCameraSelectionBinding) :
+    RecyclerView.ViewHolder(binding.root)
 
-}
-
-internal class VideoViewHolder(private val binding: OssItemVideoSelectionBinding) : RecyclerView.ViewHolder(binding.root) {
+internal class VideoViewHolder(private val binding: OssItemVideoSelectionBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun setData(videoItem: VideoFile, selectViewPosition: Int) {
         binding.croppedImage.setImageBitmap(videoItem.thumbnail)
-        binding.durationLabel.text = videoItem.getFormatedDuration()
+        binding.durationLabel.text = videoItem.getFormattedDuration()
         if (videoItem.isSelected && selectViewPosition != -1) {
             binding.whiteOverlay.visibility = View.VISIBLE
             binding.imgSelectedText.text = "$selectViewPosition"

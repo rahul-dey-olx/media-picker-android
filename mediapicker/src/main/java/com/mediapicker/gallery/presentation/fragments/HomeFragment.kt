@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
@@ -57,7 +58,8 @@ open class HomeFragment : BaseFragment() {
     }
 
     private val ossFragmentMainBinding: OssFragmentMainBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<View>(R.id.constraint_layout_parent)?.let { OssFragmentMainBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<ConstraintLayout>(R.id.constraint_layout_parent)
+            ?.let { OssFragmentMainBinding.bind(it) }
     }
 
     override fun onAttach(context: Context) {
@@ -66,12 +68,17 @@ open class HomeFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.oss_fragment_main
 
-    override fun getScreenTitle() = Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
+    override fun getScreenTitle() =
+        Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
 
     override fun setUpViews() {
-        ossFragmentMainBinding?.actionButton?.text = Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+        ossFragmentMainBinding?.actionButton?.apply {
+            setOnClickListener { onActionButtonClicked() }
+            text =
+                Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+            isSelected = false
+        }
         requestPermissions()
-
         ossFragmentMainBinding?.fullAccessButton?.setOnClickListener {
             activity?.let { it1 -> openAppSettings(it1) }
         }

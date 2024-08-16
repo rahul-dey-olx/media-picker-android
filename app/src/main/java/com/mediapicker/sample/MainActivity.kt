@@ -1,7 +1,6 @@
 package com.mediapicker.sample
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
@@ -11,17 +10,22 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.domain.contract.IGalleryCommunicator
-import com.mediapicker.gallery.domain.entity.*
+import com.mediapicker.gallery.domain.entity.CarousalConfig
+import com.mediapicker.gallery.domain.entity.PhotoFile
+import com.mediapicker.gallery.domain.entity.PhotoTag
+import com.mediapicker.gallery.domain.entity.Rule
+import com.mediapicker.gallery.domain.entity.Validation
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
+import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
 import java.io.File
 
+private const val REQUEST_VIDEO_CAPTURE: Int = 1000
 
 class MainActivity : AppCompatActivity() {
 
-    private val REQUEST_VIDEO_CAPTURE: Int = 1000
     private var fragment: HomeFragment? = null
 
     private var videoCaptureLauncher = registerForActivityResult(
@@ -78,13 +82,11 @@ class MainActivity : AppCompatActivity() {
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
             )
-            transaction.replace(
-                activityMainBinding.container.id,
-                fragment!!,
-                fragment!!::class.java.simpleName
-            )
-            transaction.addToBackStack(fragment!!.javaClass.name)
-            transaction.commitAllowingStateLoss()
+            fragment?.let {
+                transaction.replace(activityMainBinding.container.id, it, it::class.java.simpleName)
+                transaction.addToBackStack(it.javaClass.name)
+                transaction.commitAllowingStateLoss()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -158,6 +160,14 @@ class MainActivity : AppCompatActivity() {
 
         override fun onNeverAskPermissionAgain() {
             Toast.makeText(applicationContext, "Permission denied :(", Toast.LENGTH_LONG).show()
+        }
+
+        override fun onShowPermissionRationale(permissionRequest: PermissionRequestWrapper) {
+            Toast.makeText(applicationContext, "Permission show rationale :|", Toast.LENGTH_LONG)
+                .show()
+        }
+
+        override fun onStepValidate(isValid: Boolean) {
         }
     }
 

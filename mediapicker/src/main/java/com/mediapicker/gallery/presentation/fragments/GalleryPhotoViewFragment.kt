@@ -36,10 +36,11 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     }
 
     private val ossFragmentFolderView: OssFragmentFolderViewBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentFolderViewBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)
+            ?.let { OssFragmentFolderViewBinding.bind(it) }
     }
 
-    private fun removePhotoFromSelection(photo: PhotoFile, position: Int) {
+    private fun removePhotoFromSelection(photo: PhotoFile) {
         currentSelectedPhotos.removePhoto(photo)
         Gallery.carousalActionListener?.onItemClicked(photo, false)
         adapter.listCurrentPhotos = currentSelectedPhotos.toList()
@@ -78,22 +79,29 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
         }
 
         if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
-            ossFragmentFolderView?.actionButton?.text = Gallery.galleryConfig.galleryLabels.galleryFolderAction
+            ossFragmentFolderView?.actionButton?.text =
+                Gallery.galleryConfig.galleryLabels.galleryFolderAction
         }
-        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
+        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps =
+            Gallery.galleryConfig.textAllCaps
         ossFragmentFolderView?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
+
+//        baseBinding.customToolbar.apply {
+//            toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
+//            toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
+//        }
     }
 
     @SuppressLint("CheckResult")
     private fun handleItemClickListener(photo: PhotoFile, position: Int) {
         if (currentSelectedPhotos.containsPhoto(photo)) {
-            removePhotoFromSelection(photo, position)
+            removePhotoFromSelection(photo)
         } else {
-            validateNewPhoto(photo, position)
+            validateNewPhoto(photo)
         }
     }
 
-    private fun validateNewPhoto(photo: PhotoFile, position: Int) {
+    private fun validateNewPhoto(photo: PhotoFile) {
         when (val validationResult =
             photoValidationAction.canAddThisToList(currentSelectedPhotos.size, photo)) {
             is ValidationResult.Success -> {

@@ -15,7 +15,6 @@ import com.mediapicker.gallery.presentation.viewmodels.LoadAlbumViewModel
 
 class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoAlbum> {
 
-
     private val loadAlbumViewModel: LoadAlbumViewModel by lazy {
         getFragmentScopedViewModel { LoadAlbumViewModel(GalleryService(Gallery.getApp())) }
     }
@@ -25,12 +24,13 @@ class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoA
     private lateinit var adapter: GalleryFolderAdapter
 
     private val ossFragmentFolderView: OssFragmentFolderViewBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)?.let { OssFragmentFolderViewBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)
+            ?.let { OssFragmentFolderViewBinding.bind(it) }
     }
 
     private fun setAlbumData(setOfAlbum: HashSet<PhotoAlbum>) {
         adapter.apply {
-            val albumList=mutableListOf<PhotoAlbum>().apply { this.addAll(setOfAlbum) }
+            val albumList = mutableListOf<PhotoAlbum>().apply { this.addAll(setOfAlbum) }
             this.listOfFolders = albumList.sortedBy { it.name }
             notifyDataSetChanged()
         }
@@ -41,19 +41,32 @@ class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoA
     override fun setUpViews() {
         ossFragmentFolderView?.actionButton?.setOnClickListener { onActionButtonClick() }
 
-        adapter = GalleryFolderAdapter(requireContext(), listOfFolders = emptyList(), onItemClickListener = this)
+        adapter = GalleryFolderAdapter(
+            requireContext(),
+            listOfFolders = emptyList(),
+            onItemClickListener = this
+        )
         ossFragmentFolderView?.folderRV?.apply {
-            this.addItemDecoration(ItemDecorationAlbumColumns(resources.getDimensionPixelSize(R.dimen.module_base), COLUMNS_COUNT))
+            this.addItemDecoration(
+                ItemDecorationAlbumColumns(
+                    resources.getDimensionPixelSize(R.dimen.module_base),
+                    COLUMNS_COUNT
+                )
+            )
             this.layoutManager = GridLayoutManager(this@FolderViewFragment.activity, COLUMNS_COUNT)
             this.adapter = this@FolderViewFragment.adapter
         }
         ossFragmentFolderView?.actionButton?.isSelected = true
 
         if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
-            ossFragmentFolderView?.actionButton?.text = Gallery.galleryConfig.galleryLabels.galleryFolderAction
+            ossFragmentFolderView?.actionButton?.text =
+                Gallery.galleryConfig.galleryLabels.galleryFolderAction
         }
-        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
         ossFragmentFolderView?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
+        ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.apply {
+            isAllCaps = Gallery.galleryConfig.textAllCaps
+            gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
+        }
     }
 
     override fun initViewModels() {

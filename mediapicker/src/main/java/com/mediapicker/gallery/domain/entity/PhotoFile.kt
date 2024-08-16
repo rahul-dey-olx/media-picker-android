@@ -24,6 +24,7 @@ class PhotoFile : Serializable, IGalleryItem {
     var status: Status? = null
     var error: String? = null
     var adId: String? = null
+    var mimeType: String? = null
 
     val isAlreadyUploaded: Boolean
         get() = !TextUtils.isEmpty(fullPhotoUrl)
@@ -39,6 +40,7 @@ class PhotoFile : Serializable, IGalleryItem {
         this.status = builder.status
         this.error = builder.error
         this.adId = builder.adId
+        this.mimeType = builder.mimeType
     }
 
     constructor(photoSet: PhotoSet) {
@@ -67,7 +69,7 @@ class PhotoFile : Serializable, IGalleryItem {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val that = other as PhotoFile?
-        if(this.imageId == 0L || that!!.imageId == 0L){
+        if (this.imageId == 0L || that!!.imageId == 0L) {
             return this.path == that!!.path
         }
         return this.imageId == that.imageId
@@ -88,6 +90,7 @@ class PhotoFile : Serializable, IGalleryItem {
         var status: Status? = null
         var error: String? = null
         var adId: String? = null
+        var mimeType: String? = null
 
         fun imageId(imageId: Long): Builder {
             this.imageId = imageId
@@ -136,6 +139,10 @@ class PhotoFile : Serializable, IGalleryItem {
 
         fun adId(adId: String): Builder {
             this.adId = adId
+            return this
+        }
+
+        fun mimeType(): Builder {
             return this
         }
 

@@ -12,7 +12,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.domain.entity.PhotoFile
@@ -21,12 +20,16 @@ import com.mediapicker.gallery.presentation.adapters.IGalleryItemClickListener
 import com.mediapicker.gallery.presentation.adapters.SelectPhotoImageAdapter
 import com.mediapicker.gallery.presentation.utils.Constants.EXTRA_SELECTED_PHOTO
 import com.mediapicker.gallery.presentation.utils.FileUtils
+import com.mediapicker.gallery.presentation.utils.ValidatePhotos
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModel
 import java.io.Serializable
 
+private const val TAKING_PHOTO = 9999
 
 open class PhotoGridFragment : BaseViewPagerItemFragment() {
+
+    private var photoValidationAction: ValidatePhotos = ValidatePhotos()
 
     companion object {
         fun getInstance(title: String, listOfSelectedPhotos: List<PhotoFile>) =
@@ -166,7 +169,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     protected fun handleItemClick(photo: PhotoFile): Boolean {
         if (isSingleSelectionMode) {
-            onImageAdded("", photo)
+            onImageAdded(photo)
             galleryItemAdapter.notifyDataSetChanged()
             return true
         } else if (checkIfAlreadySelected(photo)) {
@@ -175,7 +178,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             onStepValidate()
             return true
         } else if (currentSelectedPhotos.size < bridgeViewModel.getMaxSelectionLimit()) {
-            if (onImageValidate("", photo) && onImageAdded("", photo)) {
+            if (onImageValidate(photo) && onImageAdded(photo)) {
                 addNewPhotoToCurrentSelection(photo, getPosition(photo))
                 onStepValidate()
                 return true
@@ -259,7 +262,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     }
 
-    private fun onImageAdded(fragmentName: String, photo: PhotoFile): Boolean {
+    private fun onImageAdded(photo: PhotoFile): Boolean {
         addItem(photo)
         Gallery.pagerCommunicator?.onItemClicked(photo, true)
         Gallery.carousalActionListener?.onItemClicked(photo, true)
@@ -267,12 +270,19 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return true
     }
 
-    fun onImageRemoved(fragmentName: String, photo: PhotoFile): Boolean {
-        return true
-    }
+//    fun onImageRemoved(fragmentName: String, photo: PhotoFile): Boolean {
+//        return true
+//    }
 
-    private fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
-        return true
+    fun onImageValidate(photo: PhotoFile): Boolean {
+        val rule = photoValidationAction.complyRulesImages(photo.path)
+        var isValid = true
+        if (rule != null) {
+            showMsg(rule.message)
+            isValid = false
+        }
+
+        return isValid
     }
 
     private fun addItem(photo: PhotoFile) {

@@ -61,12 +61,19 @@ class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
+//    override fun onDestroy() {
+//        super.onDestroy()
+////        binding = null
+//    }
+
     private fun loadImagesInGallery(imageList: MutableList<MediaGalleryEntity>) {
-        binding.imagePager.setPinchPanZoomEnabled(true)
-        binding.imagePager.setIsGallery(true)
-        binding.imagePager.setImages(imageList)
-        binding.imagePager.setSelectedPhoto(selectedPhotoIndex)
-        binding.imagePager.setOnMediaChangeListener(this)
+        binding.imagePager.apply {
+            setPinchPanZoomEnabled(true)
+            setIsGallery(true)
+            setImages(imageList)
+            setSelectedPhoto(selectedPhotoIndex)
+            setOnMediaChangeListener(this@MediaGalleryActivity)
+        }
     }
 
 //    override fun onBackPressed() {

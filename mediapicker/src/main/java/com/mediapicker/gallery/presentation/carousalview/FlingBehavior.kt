@@ -10,10 +10,17 @@ import com.google.android.material.appbar.AppBarLayout
 class FlingBehavior : AppBarLayout.Behavior {
     private var isPositive = false
 
-    constructor() {}
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+    constructor()
+    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
 
-    override fun onNestedFling(coordinatorLayout: CoordinatorLayout, child: AppBarLayout, target: View, velocityX: Float, velocityY: Float, consumed: Boolean): Boolean {
+    override fun onNestedFling(
+        coordinatorLayout: CoordinatorLayout,
+        child: AppBarLayout,
+        target: View,
+        velocityX: Float,
+        velocityY: Float,
+        consumed: Boolean
+    ): Boolean {
         var velocityY = velocityY
         var consumed = consumed
         if (velocityY > 0 && !isPositive || velocityY < 0 && isPositive) {

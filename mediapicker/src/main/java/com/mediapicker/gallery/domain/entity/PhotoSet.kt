@@ -36,7 +36,7 @@ open class PhotoSet : Serializable {
             return min(MAX_ASPECT_RATIO, max(MIN_ASPECT_RATIO, aspectRatio))
         }
 
-    constructor() {}
+    constructor()
 
     constructor(uploadedPhoto: UploadedPhoto) {
         this.id = uploadedPhoto.id
