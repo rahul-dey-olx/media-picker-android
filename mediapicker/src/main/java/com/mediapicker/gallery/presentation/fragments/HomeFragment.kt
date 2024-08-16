@@ -57,7 +57,7 @@ open class HomeFragment : BaseFragment() {
     }
 
     private val ossFragmentMainBinding: OssFragmentMainBinding? by lazy {
-        ossFragmentBaseBinding?.baseContainer?.findViewById<RelativeLayout>(R.id.linear_layout_parent)?.let { OssFragmentMainBinding.bind(it) }
+        ossFragmentBaseBinding?.baseContainer?.findViewById<View>(R.id.constraint_layout_parent)?.let { OssFragmentMainBinding.bind(it) }
     }
 
     override fun onAttach(context: Context) {

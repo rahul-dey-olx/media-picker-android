@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/linear_layout_parent"
+    android:id="@+id/constraint_layout_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:tabBackground="@android:color/white"
         app:tabIndicatorColor="@color/primary"
         app:tabSelectedTextColor="@color/primary"
@@ -19,8 +21,11 @@
         android:id="@+id/permission_access_management"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tabLayout"
-        android:gravity="end">
+        android:gravity="end"
+        app:layout_constraintBottom_toTopOf="@+id/viewPager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tabLayout">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/access_management"
@@ -38,24 +43,26 @@
             android:text="@string/request_full_access" />
     </LinearLayout>
 
-
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/permission_access_management"
-        android:layout_weight="1">
-
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/permission_access_management"
+        app:layout_constraintBottom_toTopOf="@id/action_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_weight="1" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/action_button"
         style="@style/OSS_CustomButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:animateLayoutChanges="true"
         android:enabled="true"
         android:text="@string/oss_posting_next" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
