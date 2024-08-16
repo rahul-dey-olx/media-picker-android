@@ -20,6 +20,10 @@ abstract class BaseFragmentActivity : AppCompatActivity() {
 
 //    @LayoutRes
 //    fun getLayout() = R.layout.oss_base_fragment_activity
+    override fun onDestroy() {
+        super.onDestroy()
+//        _binding = null
+    }
 
     protected fun setFragment(fragment: BaseFragment, addToBackStack: Boolean = true) {
         try {

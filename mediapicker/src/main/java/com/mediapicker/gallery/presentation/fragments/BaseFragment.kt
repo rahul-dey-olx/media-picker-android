@@ -22,6 +22,8 @@ abstract class BaseFragment : Fragment() {
         const val EXTRA_DEFAULT_PAGE = "extra_default_page"
     }
 
+    lateinit var childView: View
+
     @Suppress("UNCHECKED_CAST")
     protected fun getPhotosFromArguments(): List<PhotoFile> {
         this.arguments?.let {
@@ -53,7 +55,9 @@ abstract class BaseFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         ossFragmentBaseBinding = OssFragmentBaseBinding.inflate(inflater, container, false).apply {
-            baseContainer.addView(inflater.inflate(getLayoutId(), null))
+            childView = inflater.inflate(getLayoutId(),null)
+
+            baseContainer.addView(childView)
         }
         return ossFragmentBaseBinding?.root
     }

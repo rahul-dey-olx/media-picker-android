@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -31,6 +30,10 @@ android {
     buildFeatures {
         viewBinding true
         buildConfig = true
+    }
+
+    defaultConfig {
+        vectorDrawables.useSupportLibrary = true
     }
     namespace 'com.mediapicker.gallery'
 }

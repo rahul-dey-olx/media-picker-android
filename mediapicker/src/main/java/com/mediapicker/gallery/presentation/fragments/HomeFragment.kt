@@ -5,8 +5,12 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
+import android.widget.TableLayout
+import androidx.appcompat.widget.AppCompatButton
+import androidx.lifecycle.Observer
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.tabs.TabLayout
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.R
@@ -88,13 +92,21 @@ open class HomeFragment : BaseFragment() {
         }
     }
 
-
     override fun getLayoutId() = R.layout.oss_fragment_main
 
     override fun getScreenTitle() = Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
 
     override fun setUpViews() {
         ossFragmentMainBinding?.actionButton?.text = Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+
+        ossFragmentMainBinding?.actionButton.apply {
+            isSelected = false
+            setOnClickListener { onActionButtonClicked() }
+            text = if (Gallery.galleryConfig.galleryLabels.homeAction.isNotBlank())
+                Gallery.galleryConfig.galleryLabels.homeAction
+            else
+                getString(R.string.oss_posting_next)
+        }
 
         permissionsRequester.launch()
     }

@@ -12,6 +12,7 @@ import com.mediapicker.gallery.domain.contract.IGalleryCommunicator
 import com.mediapicker.gallery.domain.entity.*
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
+import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
 import java.io.File
@@ -30,6 +31,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(activityMainBinding.root)
         setUpGallery()
         showStepFragment()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+//        _binding = null
     }
 
     private fun getValidation(): Validation {
@@ -60,9 +66,11 @@ class MainActivity : AppCompatActivity() {
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
             )
-            transaction.replace(activityMainBinding.container.id, fragment!!, fragment!!::class.java.simpleName)
-            transaction.addToBackStack(fragment!!.javaClass.name)
-            transaction.commitAllowingStateLoss()
+            fragment?.let {
+                transaction.replace(activityMainBinding.container.id, it, it::class.java.simpleName)
+                transaction.addToBackStack(it.javaClass.name)
+                transaction.commitAllowingStateLoss()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -129,6 +137,13 @@ class MainActivity : AppCompatActivity() {
 
         override fun onNeverAskPermissionAgain() {
             Toast.makeText(applicationContext,"Permission denied :(",Toast.LENGTH_LONG).show()
+        }
+
+        override fun onShowPermissionRationale(permissionRequest: PermissionRequestWrapper) {
+            Toast.makeText(applicationContext,"Permission show rationale :|",Toast.LENGTH_LONG).show()
+        }
+
+        override fun onStepValidate(isValid: Boolean) {
         }
     }
 

@@ -3,7 +3,10 @@ package com.mediapicker.gallery.presentation.fragments
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.LinearLayout
+import android.view.View
+import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
@@ -82,6 +85,11 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
         }
         ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
         ossFragmentFolderView?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
+
+//        baseBinding.customToolbar.apply {
+//            toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
+//            toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
+//        }
     }
 
     @SuppressLint("CheckResult")

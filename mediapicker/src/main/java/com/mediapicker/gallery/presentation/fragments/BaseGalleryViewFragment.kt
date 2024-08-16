@@ -17,5 +17,4 @@ abstract class BaseGalleryViewFragment : BaseFragment() {
     override fun onBackPressed() {
         activity?.onBackPressed()
     }
-
 }

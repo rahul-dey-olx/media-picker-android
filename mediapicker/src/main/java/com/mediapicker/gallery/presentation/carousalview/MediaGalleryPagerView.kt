@@ -39,6 +39,8 @@ open class MediaGalleryPagerView @JvmOverloads constructor(
     private var pinchPanZoomEnabled = false
     private var isGallery = false
     private var mediaChangeListener: MediaChangeListener? = null
+    private var _binding: OssMediaGalleryPagerViewBinding? = null
+    private val binding get() = _binding!!
 
     val binding: OssMediaGalleryPagerViewBinding by lazy {
         OssMediaGalleryPagerViewBinding.inflate(LayoutInflater.from(context), this)

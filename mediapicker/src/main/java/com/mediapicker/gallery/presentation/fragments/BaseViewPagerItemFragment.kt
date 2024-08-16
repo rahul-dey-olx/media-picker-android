@@ -1,6 +1,7 @@
 package com.mediapicker.gallery.presentation.fragments
 
 import android.view.View
+import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager

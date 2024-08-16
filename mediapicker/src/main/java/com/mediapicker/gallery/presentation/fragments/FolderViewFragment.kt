@@ -1,7 +1,10 @@
 package com.mediapicker.gallery.presentation.fragments
 
 import android.widget.LinearLayout
+import androidx.appcompat.widget.AppCompatButton
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.data.repositories.GalleryService
@@ -14,7 +17,6 @@ import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.LoadAlbumViewModel
 
 class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoAlbum> {
-
 
     private val loadAlbumViewModel: LoadAlbumViewModel by lazy {
         getFragmentScopedViewModel { LoadAlbumViewModel(GalleryService(Gallery.getApp())) }
@@ -54,6 +56,10 @@ class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoA
         }
         ossFragmentBaseBinding?.ossCustomTool?.toolbarTitle?.isAllCaps = Gallery.galleryConfig.textAllCaps
         ossFragmentFolderView?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
+        baseBinding.customToolbar.apply {
+            toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
+            toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
+        }
     }
 
     override fun initViewModels() {

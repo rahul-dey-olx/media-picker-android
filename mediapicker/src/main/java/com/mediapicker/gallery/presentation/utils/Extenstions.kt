@@ -15,9 +15,9 @@ inline fun <reified T : ViewModel> Fragment.getFragmentScopedViewModel(noinline 
 
 inline fun <reified T : ViewModel> Fragment.getActivityScopedViewModel(noinline creator: (() -> T)? = null): T {
     return if (creator == null)
-        ViewModelProviders.of(this.activity!!).get(T::class.java)
+        ViewModelProviders.of(this.requireActivity()).get(T::class.java)
     else
-        ViewModelProviders.of(this.activity!!, BaseViewModelFactory(creator)).get(T::class.java)
+        ViewModelProviders.of(this.requireActivity(), BaseViewModelFactory(creator)).get(T::class.java)
 }
 
 

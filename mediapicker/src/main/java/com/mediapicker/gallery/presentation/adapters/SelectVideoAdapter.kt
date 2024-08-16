@@ -82,10 +82,7 @@ interface OnItemClickListener {
 }
 
 
-internal class RecordVideoViewHolder(val binding: OssItemCameraSelectionBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(){}
-
-}
+internal class RecordVideoViewHolder(val binding: OssItemCameraSelectionBinding) : RecyclerView.ViewHolder(binding.root) {}
 
 internal class VideoViewHolder(private val binding: OssItemVideoSelectionBinding) : RecyclerView.ViewHolder(binding.root) {
 

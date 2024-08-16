@@ -20,12 +20,15 @@ import com.mediapicker.gallery.presentation.adapters.SelectPhotoImageAdapter
 import com.mediapicker.gallery.presentation.utils.Constants.EXTRA_SELECTED_PHOTO
 import com.mediapicker.gallery.presentation.utils.Constants.PHOTO_SELECTION_REQUEST_CODE
 import com.mediapicker.gallery.presentation.utils.FileUtils
+import com.mediapicker.gallery.presentation.utils.ValidatePhotos
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModel
 import java.io.Serializable
 
 
 open class PhotoGridFragment : BaseViewPagerItemFragment() {
+
+    private var photoValidationAction: ValidatePhotos = ValidatePhotos()
 
     companion object {
         fun getInstance(title: String, listOfSelectedPhotos: List<PhotoFile>) =
@@ -245,8 +248,15 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return true
     }
 
-    private fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
-        return true
+    fun onImageValidate(fragmentName: String, photo: PhotoFile): Boolean {
+        val rule = photoValidationAction.complyRulesImages(photo.path)
+        var isValid = true
+        if (rule != null) {
+            showMsg(rule.message)
+            isValid = false
+        }
+
+        return isValid
     }
 
     private fun addItem(photo: PhotoFile) {
