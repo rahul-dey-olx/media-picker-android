@@ -8,28 +8,38 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
+import com.mediapicker.gallery.databinding.OssMediaGalleryActivityBinding
 import com.mediapicker.gallery.domain.entity.MediaGalleryEntity
 import com.mediapicker.gallery.presentation.carousalview.MediaGalleryPagerView
-import kotlinx.android.synthetic.main.oss_media_gallery_activity.*
 
 class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
     MediaGalleryPagerView.MediaChangeListener {
+
+    private var _binding: OssMediaGalleryActivityBinding? = null
+    private val binding get() = _binding!!
 
     private var origin = ""
     private var selectedPhotoIndex = 0
     private var mediaGalleryList: MutableList<MediaGalleryEntity> = mutableListOf()
 
     companion object {
-        fun startActivityForResult(fragment: Fragment,
-                                   mediaGalleryList: ArrayList<MediaGalleryEntity>,
-                                   mediaIndex : Int,
-                                   pageSource: String,
-                                   requestCode: Int) {
-            fragment.startActivityForResult(Intent(fragment.activity, MediaGalleryActivity::class.java).apply {
-                this.putExtra(GALLERY_MEDIA_LIST, mediaGalleryList)
-                this.putExtra(GALLERY_MEDIA_INDEX, mediaIndex)
-                this.putExtra(MEDIA_GALLERY_SOURCE, pageSource)
-            }, requestCode)
+        fun startActivityForResult(
+            fragment: Fragment,
+            mediaGalleryList: ArrayList<MediaGalleryEntity>,
+            mediaIndex: Int,
+            pageSource: String,
+            requestCode: Int
+        ) {
+            fragment.startActivityForResult(
+                Intent(
+                    fragment.activity,
+                    MediaGalleryActivity::class.java
+                ).apply {
+                    this.putExtra(GALLERY_MEDIA_LIST, mediaGalleryList)
+                    this.putExtra(GALLERY_MEDIA_INDEX, mediaIndex)
+                    this.putExtra(MEDIA_GALLERY_SOURCE, pageSource)
+                }, requestCode
+            )
         }
 
         const val GALLERY_MEDIA_LIST = "gallery_media_list"
@@ -39,34 +49,44 @@ class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.oss_media_gallery_activity)
+        _binding = OssMediaGalleryActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        if(intent != null) {
-            mediaGalleryList = intent.extras?.getSerializable(GALLERY_MEDIA_LIST) as ArrayList<MediaGalleryEntity>
-            selectedPhotoIndex = if (intent.extras?.containsKey(GALLERY_MEDIA_INDEX)!!) intent.extras!!.getInt(
-                GALLERY_MEDIA_INDEX
-            ) else 0
+        if (intent != null) {
+            mediaGalleryList =
+                intent.extras?.getSerializable(GALLERY_MEDIA_LIST) as ArrayList<MediaGalleryEntity>
+            selectedPhotoIndex =
+                if (intent.extras?.containsKey(GALLERY_MEDIA_INDEX)!!) intent.extras!!.getInt(
+                    GALLERY_MEDIA_INDEX
+                ) else 0
             origin = intent.extras?.getString(MEDIA_GALLERY_SOURCE)!!
         }
-        crossButton.setOnClickListener(this)
+        binding.crossButton.setOnClickListener(this)
         loadImagesInGallery(mediaGalleryList)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
+
     private fun loadImagesInGallery(imageList: MutableList<MediaGalleryEntity>) {
-        imagePager.setPinchPanZoomEnabled(true)
-        imagePager.setIsGallery(true)
-        imagePager.setImages(imageList)
-        imagePager.setSelectedPhoto(selectedPhotoIndex)
-        imagePager.setOnMediaChangeListener(this)
+        binding.imagePager.apply {
+            setPinchPanZoomEnabled(true)
+            setIsGallery(true)
+            setImages(imageList)
+            setSelectedPhoto(selectedPhotoIndex)
+            setOnMediaChangeListener(this@MediaGalleryActivity)
+        }
     }
 
     override fun onBackPressed() {
         closeActivityWithResult(Activity.RESULT_CANCELED)
     }
 
-    private fun closeActivityWithResult(resultCode : Int) {
+    private fun closeActivityWithResult(resultCode: Int) {
         val intent = Intent()
-        intent.putExtra(GALLERY_MEDIA_INDEX, imagePager.currentItem)
+        intent.putExtra(GALLERY_MEDIA_INDEX, binding.imagePager.currentItem)
         setResult(resultCode, intent)
         finish()
     }

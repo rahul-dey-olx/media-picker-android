@@ -2,10 +2,14 @@ package com.mediapicker.gallery.presentation.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
+import com.mediapicker.gallery.databinding.OssFragmentFolderViewBinding
 import com.mediapicker.gallery.domain.entity.PhotoAlbum
 import com.mediapicker.gallery.domain.entity.PhotoFile
 import com.mediapicker.gallery.presentation.adapters.IGalleryItemClickListener
@@ -16,9 +20,6 @@ import com.mediapicker.gallery.presentation.utils.ItemDecorationAlbumColumns
 import com.mediapicker.gallery.presentation.utils.ValidatePhotos
 import com.mediapicker.gallery.presentation.utils.ValidationResult
 import com.mediapicker.gallery.utils.SnackbarUtils
-import kotlinx.android.synthetic.main.oss_custom_toolbar.*
-import kotlinx.android.synthetic.main.oss_fragment_carousal.*
-import kotlinx.android.synthetic.main.oss_fragment_folder_view.*
 
 const val COLUMNS_COUNT = 3
 
@@ -27,6 +28,8 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     lateinit var adapter: SelectPhotoImageAdapter
 
     private var photoValidationAction: ValidatePhotos = ValidatePhotos()
+    private lateinit var folderRV: RecyclerView
+    private lateinit var actionButton: AppCompatButton
 
     private val photoAlbum: PhotoAlbum by lazy {
         arguments?.getSerializable(EXTRA_SELECTED_ALBUM) as PhotoAlbum
@@ -53,24 +56,39 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
 
     override fun setUpViews() {
         super.setUpViews()
+        folderRV = childView.findViewById(R.id.folderRV)
+        actionButton = childView.findViewById(R.id.actionButton)
+
         photoAlbum.let { album ->
-            adapter = SelectPhotoImageAdapter(album.getAlbumEntries(), currentSelectedPhotos.toList(), galleryItemClickListener, fromGallery = false)
+            adapter = SelectPhotoImageAdapter(
+                album.getAlbumEntries(),
+                currentSelectedPhotos.toList(),
+                galleryItemClickListener,
+                fromGallery = false
+            )
         }
+            folderRV.apply {
+                this.addItemDecoration(
+                    ItemDecorationAlbumColumns(
+                        resources.getDimensionPixelSize(R.dimen.module_base),
+                        COLUMNS_COUNT
+                    )
+                )
+                this.layoutManager = GridLayoutManager(activity, COLUMNS_COUNT)
+                this.adapter = this@GalleryPhotoViewFragment.adapter
+            }
 
-        folderRV.apply {
-            this.addItemDecoration(ItemDecorationAlbumColumns(resources.getDimensionPixelSize(R.dimen.module_base), COLUMNS_COUNT))
-            this.layoutManager = GridLayoutManager(activity, COLUMNS_COUNT)
-            this.adapter = this@GalleryPhotoViewFragment.adapter
+            if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
+                actionButton.text = Gallery.galleryConfig.galleryLabels.galleryFolderAction
+            }
+            actionButton.isAllCaps = Gallery.galleryConfig.textAllCaps
+            actionButton.setOnClickListener { onActionButtonClick() }
+
+
+        baseBinding.customToolbar.apply {
+            toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
+            toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
         }
-
-        if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
-            actionButton.text = Gallery.galleryConfig.galleryLabels.galleryFolderAction
-        }
-
-        toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
-        actionButton.isAllCaps = Gallery.galleryConfig.textAllCaps
-
-        toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
     }
 
     @SuppressLint("CheckResult")
@@ -83,13 +101,15 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     }
 
     private fun validateNewPhoto(photo: PhotoFile, position: Int) {
-        when(val validationResult = photoValidationAction.canAddThisToList(currentSelectedPhotos.size, photo)){
+        when (val validationResult =
+            photoValidationAction.canAddThisToList(currentSelectedPhotos.size, photo)) {
             is ValidationResult.Success -> {
                 galleryActionListener?.onPhotoSelected(photo)
                 Gallery.carousalActionListener?.onItemClicked(photo, true)
                 adapter.listCurrentPhotos = currentSelectedPhotos.toList()
                 adapter.notifyDataSetChanged()
             }
+
             is ValidationResult.Failure -> {
                 var msg = validationResult.msg
                 showError(msg)
@@ -120,7 +140,10 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
     }
 
     companion object {
-        fun getInstance(photoAlbum: PhotoAlbum, currentSelectedPhotos: java.util.LinkedHashSet<PhotoFile>) = GalleryPhotoViewFragment().apply {
+        fun getInstance(
+            photoAlbum: PhotoAlbum,
+            currentSelectedPhotos: java.util.LinkedHashSet<PhotoFile>
+        ) = GalleryPhotoViewFragment().apply {
             arguments = Bundle().apply {
                 this.putSerializable(EXTRA_SELECTED_ALBUM, photoAlbum)
                 this.putSerializable(EXTRA_SELECTED_PHOTO, currentSelectedPhotos)

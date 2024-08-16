@@ -14,7 +14,7 @@ import com.mediapicker.gallery.presentation.fragments.HomeFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
-import kotlinx.android.synthetic.main.activity_main.*
+import com.mediapicker.sample.databinding.ActivityMainBinding
 import java.io.File
 
 
@@ -23,11 +23,20 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_VIDEO_CAPTURE: Int = 1000
     private var fragment: HomeFragment? = null
 
+    private var _binding: ActivityMainBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         setUpGallery()
         showStepFragment()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
     private fun getValidation(): Validation {
@@ -58,9 +67,11 @@ class MainActivity : AppCompatActivity() {
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
             )
-            transaction.replace(container.id, fragment!!, fragment!!::class.java.simpleName)
-            transaction.addToBackStack(fragment!!.javaClass.name)
-            transaction.commitAllowingStateLoss()
+            fragment?.let {
+                transaction.replace(binding.container.id, it, it::class.java.simpleName)
+                transaction.addToBackStack(it.javaClass.name)
+                transaction.commitAllowingStateLoss()
+            }
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
@@ -77,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val transaction = supportFragmentManager.beginTransaction()
             val fragment = StepFragment()
-            transaction.replace(container.id, fragment, fragment::class.java.simpleName)
+            transaction.replace(R.id.container, fragment, fragment::class.java.simpleName)
             transaction.commitAllowingStateLoss()
         } catch (ex: Exception) {
             ex.printStackTrace()

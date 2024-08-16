@@ -121,7 +121,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             Uri.fromFile(lastRequestFileToSave)
         } else {
             FileProvider.getUriForFile(
-                context!!,
+                requireContext(),
                 Gallery.getClientAuthority(),
                 lastRequestFileToSave
             )
