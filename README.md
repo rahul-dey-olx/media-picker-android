@@ -8,6 +8,7 @@ By default it scan all the photos and videos in the device also you can provide 
 [![](https://jitpack.io/v/IndiaOlx/media-picker-android.svg)](https://jitpack.io/#IndiaOlx/media-picker-android)
 
 
+
 Add it in your root build.gradle at the end of repositories
 ```
 allprojects {
@@ -21,7 +22,7 @@ allprojects {
 Add the dependency
 ```
 dependencies {
-	implementation 'com.github.olxgroup-oss:media-picker-android:1.0.0-alpha01'
+	implementation 'com.github.IndiaOlx:media-picker-android:2.0.0_alpha_dev'
 }
 ```
 
