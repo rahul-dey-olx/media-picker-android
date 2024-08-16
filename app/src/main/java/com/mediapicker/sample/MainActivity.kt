@@ -1,10 +1,10 @@
 package com.mediapicker.sample
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.mediapicker.gallery.Gallery
@@ -17,7 +17,6 @@ import com.mediapicker.gallery.domain.entity.Rule
 import com.mediapicker.gallery.domain.entity.Validation
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
-import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
 import java.io.File
@@ -162,10 +161,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(applicationContext, "Permission denied :(", Toast.LENGTH_LONG).show()
         }
 
-        override fun onShowPermissionRationale(permissionRequest: PermissionRequestWrapper) {
-            Toast.makeText(applicationContext, "Permission show rationale :|", Toast.LENGTH_LONG)
-                .show()
-        }
+//        override fun onShowPermissionRationale(permissionRequest: PermissionRequestWrapper) {
+//            Toast.makeText(applicationContext, "Permission show rationale :|", Toast.LENGTH_LONG)
+//                .show()
+//        }
 
         override fun onStepValidate(isValid: Boolean) {
         }

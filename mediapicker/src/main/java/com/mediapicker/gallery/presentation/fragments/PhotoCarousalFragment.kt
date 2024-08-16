@@ -1,20 +1,12 @@
 package com.mediapicker.gallery.presentation.fragments
 
-import android.Manifest
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.widget.LinearLayout
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.widget.AppCompatButton
-import androidx.viewpager.widget.ViewPager
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayout
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.R
@@ -30,7 +22,6 @@ import com.mediapicker.gallery.presentation.carousalview.CarousalActionListener
 import com.mediapicker.gallery.presentation.carousalview.MediaGalleryView
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.utils.PermissionsUtil
-import com.mediapicker.gallery.presentation.utils.PermissionRequestWrapper
 import com.mediapicker.gallery.presentation.utils.getActivityScopedViewModel
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.BridgeViewModel
@@ -81,16 +72,6 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     private val ossFragmentCarousalBinding: OssFragmentCarousalBinding? by lazy {
         ossFragmentBaseBinding?.baseContainer?.findViewById<LinearLayout>(R.id.linear_layout_parent)
             ?.let { OssFragmentCarousalBinding.bind(it) }
-    }
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
-    private fun onShowRationale(permissionRequest: PermissionRequest) {
-        Gallery.galleryConfig.galleryCommunicator?.onShowPermissionRationale(
-            PermissionRequestWrapper(permissionRequest)
-        )
     }
 
     override fun getLayoutId() = R.layout.oss_fragment_carousal
@@ -210,7 +191,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
 
     private fun setUpWithOutTabLayout() {
         ossFragmentCarousalBinding?.tabLayout?.visibility = View.GONE
-        mediaGalleryView.setImagesForPager(
+        ossFragmentCarousalBinding?.mediaGalleryView?.setImagesForPager(
             convertPhotoFileToMediaGallery(
                 getPhotosFromArguments()
             )
@@ -241,7 +222,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     }
 
     private fun setUpWithTabLayout() {
-        viewPager.apply {
+        ossFragmentCarousalBinding?.viewPager.apply {
             PagerAdapter(
                 childFragmentManager, listOf(
                     PhotoGridFragment.getInstance(
@@ -254,9 +235,9 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
                     )
                 )
             ).apply {
-                viewPager.adapter = this
+                ossFragmentCarousalBinding?.viewPager?.adapter = this
             }
-            tabLayout.setupWithViewPager(viewPager)
+            ossFragmentCarousalBinding?.tabLayout?.setupWithViewPager(ossFragmentCarousalBinding?.viewPager)
         }
     }
 
@@ -354,7 +335,8 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
         Gallery.carousalActionListener?.onGalleryImagePreview(
             mediaIndex,
             bridgeViewModel.getSelectedPhotos().size
-        )        val intent = MediaGalleryActivity.createIntent(
+        )
+        val intent = MediaGalleryActivity.createIntent(
             this,
             convertPhotoFileToMediaGallery(bridgeViewModel.getSelectedPhotos()),
             mediaIndex,
