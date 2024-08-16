@@ -25,23 +25,17 @@ class MediaGalleryActivity : AppCompatActivity(), View.OnClickListener,
     }
 
     companion object {
-        fun startActivityForResult(
+        fun createIntent(
             fragment: Fragment,
             mediaGalleryList: ArrayList<MediaGalleryEntity>,
             mediaIndex: Int,
-            pageSource: String,
-            requestCode: Int
-        ) {
-            fragment.startActivityForResult(
-                Intent(
-                    fragment.activity,
-                    MediaGalleryActivity::class.java
-                ).apply {
-                    this.putExtra(GALLERY_MEDIA_LIST, mediaGalleryList)
-                    this.putExtra(GALLERY_MEDIA_INDEX, mediaIndex)
-                    this.putExtra(MEDIA_GALLERY_SOURCE, pageSource)
-                }, requestCode
-            )
+            pageSource: String
+        ): Intent {
+            return Intent( fragment.activity, MediaGalleryActivity::class.java).apply {
+                putExtra(GALLERY_MEDIA_LIST, mediaGalleryList)
+                putExtra(GALLERY_MEDIA_INDEX, mediaIndex)
+                putExtra(MEDIA_GALLERY_SOURCE, pageSource)
+            }
         }
 
         const val GALLERY_MEDIA_LIST = "gallery_media_list"

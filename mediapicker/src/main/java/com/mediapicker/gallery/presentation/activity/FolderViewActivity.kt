@@ -17,22 +17,6 @@ import com.mediapicker.gallery.presentation.utils.Constants.PHOTO_SELECTION_REQU
 
 class FolderViewActivity : BaseFragmentActivity(), GalleryActionListener {
 
-    companion object {
-        fun startActivityForResult(
-            fragment: Fragment,
-            currentSelectPhotos: LinkedHashSet<PhotoFile>
-        ) {
-            fragment.startActivityForResult(
-                Intent(
-                    fragment.activity,
-                    FolderViewActivity::class.java
-                ).apply {
-                    this.putExtra(EXTRA_SELECTED_PHOTO, currentSelectPhotos)
-                }, PHOTO_SELECTION_REQUEST_CODE
-            )
-        }
-    }
-
     private var currentSelectedPhotos = LinkedHashSet<PhotoFile>()
 
     override fun onCreate(savedInstanceState: Bundle?) {

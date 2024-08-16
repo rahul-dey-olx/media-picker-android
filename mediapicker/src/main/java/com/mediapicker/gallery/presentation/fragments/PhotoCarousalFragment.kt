@@ -1,6 +1,7 @@
 package com.mediapicker.gallery.presentation.fragments
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -38,8 +39,6 @@ import java.util.*
 open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     MediaGalleryView.OnGalleryItemClickListener {
 
-    private val PHOTO_PREVIEW = 43475
-
     private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
         PermissionsUtil.handlePermissionsResult(
             requireActivity(),
@@ -47,6 +46,13 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             onAllPermissionsGranted = { checkPermissions() },
             onPermissionDenied = { onPermissionDenied() }
         )
+    }
+    private  var photoPreviewLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val data = result.data
+            val index = data?.extras?.getInt("gallery_media_index", 0) ?: 0
+            ossFragmentCarousalBinding?.mediaGalleryView?.setSelectedPhoto(index)
+        }
     }
 
     private val homeViewModel: HomeViewModel by lazy {
@@ -292,27 +298,16 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
 
     override fun onGalleryItemClick(mediaIndex: Int) {
         Gallery.carousalActionListener?.onGalleryImagePreview()
-        MediaGalleryActivity.startActivityForResult(
-            this, convertPhotoFileToMediaGallery(
-                bridgeViewModel.getSelectedPhotos()
-            ), mediaIndex, "", PHOTO_PREVIEW
+        val intent = MediaGalleryActivity.createIntent(
+            this,
+            convertPhotoFileToMediaGallery(bridgeViewModel.getSelectedPhotos()),
+            mediaIndex,
+            ""
         )
+        photoPreviewLauncher.launch(intent)
     }
 
     private fun requestPermissions() {
         PermissionsUtil.requestPermissions(requireActivity(), permissionLauncher)
-    }
-
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PHOTO_PREVIEW && view != null) {
-            var index = 0
-            if (data != null) {
-                val bundle = data.extras
-                index = bundle!!.getInt("gallery_media_index", 0)
-            }
-            ossFragmentCarousalBinding?.mediaGalleryView?.setSelectedPhoto(index)
-        }
     }
 }
