@@ -32,7 +32,6 @@ class MainActivity : AppCompatActivity() {
     ) { result ->
         if (result.resultCode == RESULT_OK) {
             val videoUri: Uri? = result.data?.data
-            Toast.makeText(baseContext, "Recorded ", Toast.LENGTH_LONG).show()
             fragment?.reloadMedia()
         }
     }
