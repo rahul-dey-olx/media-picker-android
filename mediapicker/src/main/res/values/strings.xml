@@ -25,5 +25,7 @@
     <string name="settings">Settings</string>
     <string name="cancel">Cancel</string>
     <string name="permissions_denied_rationale">Permissions denied. Please grant the required permissions to proceed.</string>
-
+    <string name="photos_partially_granted">You have granted some parts of the photos</string>
+    <string name="allow">Allow</string>
+    <string name="photos_denied">You haven\'t granted any photos</string>
 </resources>
