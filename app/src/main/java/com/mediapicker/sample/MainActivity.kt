@@ -16,6 +16,7 @@ import com.mediapicker.gallery.domain.entity.PhotoTag
 import com.mediapicker.gallery.domain.entity.Rule
 import com.mediapicker.gallery.domain.entity.Validation
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
+import com.mediapicker.gallery.presentation.fragments.PhotoCarousalFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
@@ -25,7 +26,7 @@ private const val REQUEST_VIDEO_CAPTURE: Int = 1000
 
 class MainActivity : AppCompatActivity() {
 
-    private var fragment: HomeFragment? = null
+    private var fragment: PhotoCarousalFragment? = null
 
     private var videoCaptureLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val transaction = supportFragmentManager.beginTransaction()
             val photos = SelectedItemHolder.listOfSelectedPhotos
-            fragment = DemoHomeFragment.getInstance(
+            fragment = PhotoCarousalFragment.getInstance(
                 photos,
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
