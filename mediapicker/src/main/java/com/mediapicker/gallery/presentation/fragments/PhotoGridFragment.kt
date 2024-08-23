@@ -90,7 +90,8 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             if (lastRequestFileToSavePath.isNotEmpty()) {
                 insertIntoGallery()
             }
-            addItem(getPhoto(lastRequestFileToSavePath))
+            // To avoid preselect issue during camera photo click
+            // addItem(getPhoto(lastRequestFileToSavePath))
             loadPhotoViewModel.loadMedia(this)
         } else {
             isExpectingNewPhoto = false
