@@ -78,6 +78,8 @@ class GalleryPhotoViewFragment : BaseGalleryViewFragment() {
             this.adapter = this@GalleryPhotoViewFragment.adapter
         }
 
+        ossFragmentFolderView?.actionButton?.isSelected = true
+
         if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
             ossFragmentFolderView?.actionButton?.text =
                 Gallery.galleryConfig.galleryLabels.galleryFolderAction
