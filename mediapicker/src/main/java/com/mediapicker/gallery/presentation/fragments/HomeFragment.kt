@@ -117,6 +117,7 @@ open class HomeFragment : BaseFragment() {
 
     fun onPermissionDenied() {
         checkPermission()
+
         // activity?.supportFragmentManager?.popBackStack()
         Gallery.galleryConfig.galleryCommunicator?.onPermissionDenied()
     }
