@@ -1,9 +1,7 @@
 package com.mediapicker.gallery.presentation.fragments
 
 import android.view.View
-import android.widget.ProgressBar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -40,7 +38,7 @@ abstract class BaseViewPagerItemFragment : BaseFragment() {
     override fun initViewModels() {
         super.initViewModels()
         bridgeViewModel.getMediaStateLiveData().observe(this) { reloadMedia() }
-        getBaseLoadMediaViewModel().getLoadingState().observe(this) { handleLoadingState(it) }
+        getBaseLoadMediaViewModel()?.getLoadingState()?.observe(this) { handleLoadingState(it) }
     }
 
     override fun setUpViews() {
@@ -59,10 +57,10 @@ abstract class BaseViewPagerItemFragment : BaseFragment() {
 
     override fun getLayoutId() = R.layout.oss_fragment_gallery
 
-    abstract fun getBaseLoadMediaViewModel(): BaseLoadMediaViewModel
+    abstract fun getBaseLoadMediaViewModel(): BaseLoadMediaViewModel?
 
     protected open fun reloadMedia() {
-        getBaseLoadMediaViewModel().loadMedia(this)
+        getBaseLoadMediaViewModel()?.loadMedia(this)
     }
 
     private fun handleLoadingState(stateData: StateData) {

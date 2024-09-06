@@ -1,5 +1,6 @@
 package com.mediapicker.gallery.presentation.viewmodels
 
+import android.app.Application
 import android.content.ContentUris
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -13,7 +14,10 @@ import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.presentation.viewmodels.factory.BaseLoadMediaViewModel
 import java.io.Serializable
 
-class LoadVideoViewModel(val galleryConfig: GalleryConfig) : BaseLoadMediaViewModel(galleryConfig) {
+class LoadVideoViewModel(private val application: Application) :
+    BaseLoadMediaViewModel(application) {
+
+    var galleryConfig: GalleryConfig? = null
 
     private val videoItemLiveData = MutableLiveData<List<VideoItem>>()
 
@@ -22,29 +26,31 @@ class LoadVideoViewModel(val galleryConfig: GalleryConfig) : BaseLoadMediaViewMo
     fun getVideoItem() = videoItemLiveData
 
     private fun getFolderCriteria(): Pair<String, String> {
-        if (galleryConfig.mediaScanningCriteria.hasCustomQueryForVideo()) {
+        if (galleryConfig?.mediaScanningCriteria?.hasCustomQueryForVideo() == true) {
             return Pair(
                 " AND ${MediaStore.Video.VideoColumns.DATA} like ? ",
-                "%${galleryConfig.mediaScanningCriteria.videoBrowseQuery}%"
+                "%${galleryConfig?.mediaScanningCriteria?.videoBrowseQuery}%"
             )
         }
         return Pair("", "")
     }
 
     override fun getCursorLoader(): Loader<Cursor> {
-        var selection = MediaStore.Images.Media.MIME_TYPE + "!=? "
-        val mimeTypeGif = MimeTypeMap.getSingleton().getMimeTypeFromExtension("gif")
-        val projection = mutableListOf<String?>(mimeTypeGif)
-        val folderCriteria = getFolderCriteria()
-        if (folderCriteria.first.isNotEmpty()) {
-            selection += folderCriteria.first
-            projection.add(folderCriteria.second)
+        application.let {
+            var selection = MediaStore.Images.Media.MIME_TYPE + "!=? "
+            val mimeTypeGif = MimeTypeMap.getSingleton().getMimeTypeFromExtension("gif")
+            val projection = mutableListOf<String?>(mimeTypeGif)
+            val folderCriteria = getFolderCriteria()
+            if (folderCriteria.first.isNotEmpty()) {
+                selection += folderCriteria.first
+                projection.add(folderCriteria.second)
+            }
+            return CursorLoader(
+                it,
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, selection,
+                projection.toTypedArray(), MediaStore.Images.Media.DATE_TAKEN + " DESC"
+            )
         }
-        return CursorLoader(
-            galleryConfig.applicationContext,
-            MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, selection,
-            projection.toTypedArray(), MediaStore.Images.Media.DATE_TAKEN + " DESC"
-        )
     }
 
     override fun getUniqueLoaderId() = 2
@@ -68,7 +74,7 @@ class LoadVideoViewModel(val galleryConfig: GalleryConfig) : BaseLoadMediaViewMo
                 val contentUri: Uri =
                     ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id)
                 val thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
-                    galleryConfig.applicationContext.contentResolver,
+                    application.contentResolver,
                     id, MediaStore.Video.Thumbnails.MICRO_KIND, null
                 )
                 if (!name.isNullOrBlank() && duration > 0)

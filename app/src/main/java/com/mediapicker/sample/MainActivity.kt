@@ -16,7 +16,6 @@ import com.mediapicker.gallery.domain.entity.PhotoTag
 import com.mediapicker.gallery.domain.entity.Rule
 import com.mediapicker.gallery.domain.entity.Validation
 import com.mediapicker.gallery.presentation.fragments.HomeFragment
-import com.mediapicker.gallery.presentation.fragments.PhotoCarousalFragment
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.viewmodels.VideoFile
 import com.mediapicker.sample.databinding.ActivityMainBinding
@@ -57,7 +56,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun setUpGallery() {
         val galleryConfig = GalleryConfig.GalleryConfigBuilder(
-            applicationContext,
             BuildConfig.APPLICATION_ID + ".provider",
             MyClientGalleryCommunicator()
         )

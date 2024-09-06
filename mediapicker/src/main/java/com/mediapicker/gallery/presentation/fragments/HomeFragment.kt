@@ -19,7 +19,6 @@ import com.mediapicker.gallery.presentation.activity.GalleryActivity
 import com.mediapicker.gallery.presentation.adapters.PagerAdapter
 import com.mediapicker.gallery.presentation.utils.DefaultPage
 import com.mediapicker.gallery.presentation.utils.PermissionsUtil
-import com.mediapicker.gallery.presentation.utils.PermissionsUtil.openAppSettings
 import com.mediapicker.gallery.presentation.utils.getActivityScopedViewModel
 import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.BridgeViewModel
@@ -29,14 +28,15 @@ import com.mediapicker.gallery.utils.SnackbarUtils
 import java.io.Serializable
 
 open class HomeFragment : BaseFragment() {
-    private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
-        PermissionsUtil.handlePermissionsResult(
-            requireActivity(),
-            granted,
-            onAllPermissionsGranted = { checkPermissions() },
-            onPermissionDenied = { onPermissionDenied() }
-        )
-    }
+    private var permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+            PermissionsUtil.handlePermissionsResult(
+                requireActivity(),
+                granted,
+                onAllPermissionsGranted = { checkPermissions() },
+                onPermissionDenied = { onPermissionDenied() }
+            )
+        }
 
     private val homeViewModel: HomeViewModel by lazy {
         getFragmentScopedViewModel { HomeViewModel(Gallery.galleryConfig) }
@@ -61,20 +61,18 @@ open class HomeFragment : BaseFragment() {
             ?.let { OssFragmentMainBinding.bind(it) }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-    }
-
     override fun getLayoutId() = R.layout.oss_fragment_main
 
     override fun getScreenTitle() =
-        Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
+        Gallery.galleryConfig.galleryLabels.homeTitle?.ifBlank { getString(R.string.oss_title_home_screen) }
+            ?: getString(R.string.oss_title_home_screen)
 
     override fun setUpViews() {
         ossFragmentMainBinding?.actionButton?.apply {
             setOnClickListener { onActionButtonClicked() }
             text =
-                Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+                Gallery.galleryConfig.galleryLabels.homeAction?.ifBlank { getString(R.string.oss_posting_next) }
+                    ?: getString(R.string.oss_posting_next)
             isSelected = false
         }
         requestPermissions()
@@ -218,10 +216,12 @@ open class HomeFragment : BaseFragment() {
 
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            && (ContextCompat.checkSelfPermission(requireContext(),
+            && (ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_IMAGES
             ) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(requireContext(),
+                    || ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_VIDEO
             ) == PackageManager.PERMISSION_GRANTED)
         ) {
@@ -229,7 +229,8 @@ open class HomeFragment : BaseFragment() {
             ossFragmentMainBinding?.permissionAccessManagement?.visibility = View.GONE
         } else if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-            ContextCompat.checkSelfPermission(requireContext(),
+            ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
             ) == PackageManager.PERMISSION_GRANTED
         ) {
@@ -237,7 +238,8 @@ open class HomeFragment : BaseFragment() {
             ossFragmentMainBinding?.textView?.text = getString(R.string.photos_partially_granted)
             ossFragmentMainBinding?.button?.text = getString(R.string.allow)
             ossFragmentMainBinding?.permissionAccessManagement?.visibility = View.VISIBLE
-        } else if (ContextCompat.checkSelfPermission(requireContext(),
+        } else if (ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
@@ -250,6 +252,7 @@ open class HomeFragment : BaseFragment() {
             ossFragmentMainBinding?.permissionAccessManagement?.visibility = View.VISIBLE
         }
     }
+
     companion object {
         fun getInstance(
             listOfSelectedPhotos: List<PhotoFile> = emptyList(),

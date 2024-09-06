@@ -15,8 +15,12 @@ import com.mediapicker.gallery.presentation.viewmodels.LoadAlbumViewModel
 
 class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoAlbum> {
 
-    private val loadAlbumViewModel: LoadAlbumViewModel by lazy {
-        getFragmentScopedViewModel { LoadAlbumViewModel(GalleryService(Gallery.getApp())) }
+    private val loadAlbumViewModel: LoadAlbumViewModel? by lazy {
+        context?.contentResolver?.let { appContext ->
+            getFragmentScopedViewModel {
+                LoadAlbumViewModel(GalleryService(appContext))
+            }
+        }
     }
 
     override fun getScreenTitle() = getString(R.string.oss_title_folder_fragment)
@@ -58,7 +62,7 @@ class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoA
         }
         ossFragmentFolderView?.actionButton?.isSelected = true
 
-        if (Gallery.galleryConfig.galleryLabels.galleryFolderAction.isNotBlank()) {
+        if (Gallery.galleryConfig.galleryLabels.galleryFolderAction?.isNotBlank() == true) {
             ossFragmentFolderView?.actionButton?.text =
                 Gallery.galleryConfig.galleryLabels.galleryFolderAction
         }
@@ -71,8 +75,8 @@ class FolderViewFragment : BaseGalleryViewFragment(), OnItemClickListener<PhotoA
 
     override fun initViewModels() {
         super.initViewModels()
-        loadAlbumViewModel.getAlbums().observe(this) { setAlbumData(it) }
-        loadAlbumViewModel.loadAlbums()
+        loadAlbumViewModel?.getAlbums()?.observe(this) { setAlbumData(it) }
+        loadAlbumViewModel?.loadAlbums()
     }
 
     override fun onResume() {
