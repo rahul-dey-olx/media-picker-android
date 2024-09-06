@@ -26,7 +26,7 @@ private const val REQUEST_VIDEO_CAPTURE: Int = 1000
 
 class MainActivity : AppCompatActivity() {
 
-    private var fragment: PhotoCarousalFragment? = null
+    private var fragment: HomeFragment? = null
 
     private var videoCaptureLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         try {
             val transaction = supportFragmentManager.beginTransaction()
             val photos = SelectedItemHolder.listOfSelectedPhotos
-            fragment = PhotoCarousalFragment.getInstance(
+            fragment = HomeFragment.getInstance(
                 photos,
                 SelectedItemHolder.listOfSelectedVideos,
                 defaultPageType = DefaultPage.PhotoPage
