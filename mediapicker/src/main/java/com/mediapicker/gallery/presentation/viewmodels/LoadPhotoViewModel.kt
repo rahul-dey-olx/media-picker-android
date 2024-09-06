@@ -1,6 +1,7 @@
 package com.mediapicker.gallery.presentation.viewmodels
 
 //import android.database.DataSetObserver
+import android.app.Application
 import android.database.Cursor
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
@@ -14,12 +15,14 @@ import com.mediapicker.gallery.domain.entity.PhotoAlbum
 import com.mediapicker.gallery.domain.entity.PhotoFile
 import com.mediapicker.gallery.presentation.viewmodels.factory.BaseLoadMediaViewModel
 
-class LoadPhotoViewModel(val galleryConfig: GalleryConfig) :
-    BaseLoadMediaViewModel(galleryConfig) {
+class LoadPhotoViewModel(private val application: Application) :
+    BaseLoadMediaViewModel(application) {
 
     companion object {
         private const val COL_FULL_PHOTO_URL = "fullPhotoUrl"
     }
+
+    var galleryConfig: GalleryConfig? = null
 
 //    private var isObserverRegistered = false
 //
@@ -90,13 +93,13 @@ class LoadPhotoViewModel(val galleryConfig: GalleryConfig) :
 //    }
 
     private fun needToAddFolderView(): Boolean {
-        return (galleryConfig.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithFolderOnly
-                || galleryConfig.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithFolderAndVideo
-                || galleryConfig.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithoutCameraFolderOnly)
+        return (galleryConfig?.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithFolderOnly
+                || galleryConfig?.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithFolderAndVideo
+                || galleryConfig?.typeOfMediaSupported == GalleryConfig.MediaType.PhotoWithoutCameraFolderOnly)
     }
 
     private fun needToAddCameraView(): Boolean {
-        return (galleryConfig.typeOfMediaSupported != GalleryConfig.MediaType.PhotoWithoutCameraFolderOnly)
+        return (galleryConfig?.typeOfMediaSupported != GalleryConfig.MediaType.PhotoWithoutCameraFolderOnly)
     }
 
 

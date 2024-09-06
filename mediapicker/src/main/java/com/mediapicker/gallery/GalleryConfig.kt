@@ -1,6 +1,5 @@
 package com.mediapicker.gallery
 
-import android.content.Context
 import androidx.annotation.LayoutRes
 import com.mediapicker.gallery.domain.contract.GalleryCommunicatorDefaultImpl
 import com.mediapicker.gallery.domain.contract.IGalleryCommunicator
@@ -11,7 +10,6 @@ import com.mediapicker.gallery.domain.entity.PhotoTag
 import com.mediapicker.gallery.domain.entity.Validation
 
 class GalleryConfig(
-    val applicationContext: Context,
     val clientAuthority: String,
     var galleryCommunicator: IGalleryCommunicator?,
     val shouldUsePhotoCamera: Boolean,
@@ -31,13 +29,12 @@ class GalleryConfig(
 
     fun shouldOnlyValidatePhoto() = typeOfMediaSupported == MediaType.PhotoWithFolderOnly || typeOfMediaSupported == MediaType.PhotoOnly || typeOfMediaSupported == MediaType.PhotoWithoutCameraFolderOnly
 
-    fun isGalleryInitialize() = applicationContext != null && clientAuthority != null
+//    fun isGalleryInitialize() = applicationContext != null && clientAuthority != null
 
 
     class GalleryNotInitilizedException(message: String = "Please initialize gallery with application and client authority") : Exception(message)
 
     class GalleryConfigBuilder(
-        private val applicationContext: Context,
         private val clientAuthority: String,
         private val galleryCommunicator: IGalleryCommunicator? = GalleryCommunicatorDefaultImpl()
     ) {
@@ -82,7 +79,6 @@ class GalleryConfig(
         fun mediaScanningCriteria(mediaScanningCriteria: MediaScanningCriteria) = apply { this.mediaScanningCriteria = mediaScanningCriteria }
 
         fun build() = GalleryConfig(
-            applicationContext,
             clientAuthority,
             galleryCommunicator,
             shouldUsePhotoCamera,

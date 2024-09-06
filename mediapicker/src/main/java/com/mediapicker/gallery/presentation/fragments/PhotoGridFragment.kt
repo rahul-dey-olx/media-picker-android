@@ -8,10 +8,10 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import androidx.lifecycle.ViewModelProvider
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.domain.entity.PhotoFile
@@ -21,7 +21,6 @@ import com.mediapicker.gallery.presentation.adapters.SelectPhotoImageAdapter
 import com.mediapicker.gallery.presentation.utils.Constants.EXTRA_SELECTED_PHOTO
 import com.mediapicker.gallery.presentation.utils.FileUtils
 import com.mediapicker.gallery.presentation.utils.ValidatePhotos
-import com.mediapicker.gallery.presentation.utils.getFragmentScopedViewModel
 import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModel
 import java.io.Serializable
 
@@ -60,9 +59,10 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return@lazy i
     }
 
-
     private val loadPhotoViewModel: LoadPhotoViewModel by lazy {
-        getFragmentScopedViewModel { LoadPhotoViewModel(Gallery.galleryConfig) }
+        ViewModelProvider(this)[LoadPhotoViewModel::class.java].apply {
+            galleryConfig = Gallery.galleryConfig
+        }
     }
 
     private val galleryItemAdapter: SelectPhotoImageAdapter by lazy {
@@ -74,29 +74,32 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         )
     }
 
-    private var photoSelectionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            val finalSelectionFromFolders = data?.getSerializableExtra(EXTRA_SELECTED_PHOTO) as? LinkedHashSet<PhotoFile>
-            finalSelectionFromFolders?.let {
-                setSelectedFromFolderAndNotify(it)
+    private var photoSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val finalSelectionFromFolders =
+                    data?.getSerializableExtra(EXTRA_SELECTED_PHOTO) as? LinkedHashSet<PhotoFile>
+                finalSelectionFromFolders?.let {
+                    setSelectedFromFolderAndNotify(it)
+                }
             }
         }
-    }
 
     // Initialize the ActivityResultLauncher for taking a photo
-    private var  takePhotoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            if (lastRequestFileToSavePath.isNotEmpty()) {
-                insertIntoGallery()
+    private var takePhotoLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                if (lastRequestFileToSavePath.isNotEmpty()) {
+                    insertIntoGallery()
+                }
+                // To avoid preselect issue during camera photo click
+                // addItem(getPhoto(lastRequestFileToSavePath))
+                loadPhotoViewModel.loadMedia(this)
+            } else {
+                isExpectingNewPhoto = false
             }
-            // To avoid preselect issue during camera photo click
-            // addItem(getPhoto(lastRequestFileToSavePath))
-            loadPhotoViewModel.loadMedia(this)
-        } else {
-            isExpectingNewPhoto = false
         }
-    }
 
     override fun getScreenTitle() = getString(R.string.oss_title_tab_photo)
 

@@ -39,21 +39,23 @@ private const val PHOTO_PREVIEW = 43475
 open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     MediaGalleryView.OnGalleryItemClickListener {
 
-    private  var permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
-        PermissionsUtil.handlePermissionsResult(
-            requireActivity(),
-            granted,
-            onAllPermissionsGranted = { checkPermissions() },
-            onPermissionDenied = { onPermissionDenied() }
-        )
-    }
-    private  var photoPreviewLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data
-            val index = data?.extras?.getInt("gallery_media_index", 0) ?: 0
-            ossFragmentCarousalBinding?.mediaGalleryView?.setSelectedPhoto(index)
+    private var permissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { granted ->
+            PermissionsUtil.handlePermissionsResult(
+                requireActivity(),
+                granted,
+                onAllPermissionsGranted = { checkPermissions() },
+                onPermissionDenied = { onPermissionDenied() }
+            )
         }
-    }
+    private var photoPreviewLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val index = data?.extras?.getInt("gallery_media_index", 0) ?: 0
+                ossFragmentCarousalBinding?.mediaGalleryView?.setSelectedPhoto(index)
+            }
+        }
 
     private val homeViewModel: HomeViewModel by lazy {
         getFragmentScopedViewModel { HomeViewModel(Gallery.galleryConfig) }
@@ -81,7 +83,8 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
     override fun getLayoutId() = R.layout.oss_fragment_carousal
 
     override fun getScreenTitle() =
-        Gallery.galleryConfig.galleryLabels.homeTitle.ifBlank { getString(R.string.oss_title_home_screen) }
+        Gallery.galleryConfig.galleryLabels.homeTitle?.ifBlank { getString(R.string.oss_title_home_screen) }
+            ?: getString(R.string.oss_title_home_screen)
 
     override fun setUpViews() {
         Gallery.pagerCommunicator = this
@@ -98,12 +101,14 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
         }
 
         ossFragmentCarousalBinding?.actionButton?.text =
-            if (Gallery.galleryConfig.galleryLabels.homeAction.isNotBlank())
+            if (Gallery.galleryConfig.galleryLabels.homeAction?.isNotBlank() == true)
                 Gallery.galleryConfig.galleryLabels.homeAction
             else
                 getString(R.string.oss_posting_next)
         ossFragmentCarousalBinding?.actionButton?.isAllCaps = Gallery.galleryConfig.textAllCaps
-        ossFragmentCarousalBinding?.actionButton?.text = Gallery.galleryConfig.galleryLabels.homeAction.ifBlank { getString(R.string.oss_posting_next) }
+        ossFragmentCarousalBinding?.actionButton?.text =
+            Gallery.galleryConfig.galleryLabels.homeAction?.ifBlank { getString(R.string.oss_posting_next) }
+                ?: getString(R.string.oss_posting_next)
         ossFragmentBaseBinding?.ossCustomTool?.apply {
             toolbarTitle.isAllCaps = Gallery.galleryConfig.textAllCaps
             toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
@@ -357,10 +362,12 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
 
     private fun checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            && (ContextCompat.checkSelfPermission(requireContext(),
+            && (ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_IMAGES
             ) == PackageManager.PERMISSION_GRANTED
-                    || ContextCompat.checkSelfPermission(requireContext(),
+                    || ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_VIDEO
             ) == PackageManager.PERMISSION_GRANTED)
         ) {
@@ -368,15 +375,18 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             ossFragmentCarousalBinding?.permissionAccessManagement?.visibility = View.GONE
         } else if (
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE &&
-            ContextCompat.checkSelfPermission(requireContext(),
+            ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             // Partial access on Android 14 (API level 34) or higher
-            ossFragmentCarousalBinding?.textView?.text = getString(R.string.photos_partially_granted)
+            ossFragmentCarousalBinding?.textView?.text =
+                getString(R.string.photos_partially_granted)
             ossFragmentCarousalBinding?.button?.text = getString(R.string.allow)
             ossFragmentCarousalBinding?.permissionAccessManagement?.visibility = View.VISIBLE
-        } else if (ContextCompat.checkSelfPermission(requireContext(),
+        } else if (ContextCompat.checkSelfPermission(
+                requireContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
             ) == PackageManager.PERMISSION_GRANTED
         ) {
