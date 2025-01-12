@@ -60,7 +60,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return@lazy i
     }
 
-    private var captureImageUri : Uri? =null
+    private var captureImageUri: Uri? = null
 
     private val loadPhotoViewModel: LoadPhotoViewModelV2 by lazy {
         ViewModelProvider(this)[LoadPhotoViewModelV2::class.java]
@@ -76,7 +76,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
     }
 
     private val photoSelectionLauncher =
-        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(Gallery.galleryConfig.validation.getMaxPhotoSelectionRule().maxSelectionLimit)) { uris ->
             loadPhotoViewModel.addPhotos(uris.mapNotNull { context?.saveUriToInternalStorage(it) })
         }
 
