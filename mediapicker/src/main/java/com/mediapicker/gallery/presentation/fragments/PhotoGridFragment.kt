@@ -106,7 +106,10 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
             galleryItemAdapter.updateGalleryItems(it)
             onStepValidate()
         }
-        loadPhotoViewModel.loadData(Gallery.galleryConfig)
+        loadPhotoViewModel.loadData(
+            config = Gallery.galleryConfig,
+            preSelectedItems = getPhotosFromArguments().toMutableList()
+        )
     }
 
     private val galleryItemSelectHandler = object :

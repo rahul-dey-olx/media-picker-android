@@ -28,9 +28,9 @@ class LoadPhotoViewModelV2(application: Application) : BaseLoadMediaViewModel(ap
 
     private lateinit var config: GalleryConfig
 
-    fun loadData(config: GalleryConfig) {
+    fun loadData(config: GalleryConfig, preSelectedItems: List<IGalleryItem>) {
         this.config = config
-        addGalleryAndCameraView()
+        initializeGalleryItems(preSelectedItems)
     }
 
     fun addPhotos(photos: List<File>) {
@@ -55,13 +55,14 @@ class LoadPhotoViewModelV2(application: Application) : BaseLoadMediaViewModel(ap
     }
 
 
-    private fun addGalleryAndCameraView() {
-        val galleryItems = mutableListOf<IGalleryItem>()
+    private fun initializeGalleryItems(preSelectedItems: List<IGalleryItem>) {
+        val initialItems = mutableListOf<IGalleryItem>()
         if (needToAddCameraView())
-            galleryItems.add(CameraItem())
+            initialItems.add(CameraItem())
         if (needToAddFolderView())
-            galleryItems.add(PhotoAlbum.dummyInstance)
-        _galleryItems.postValue(galleryItems)
+            initialItems.add(PhotoAlbum.dummyInstance)
+        initialItems.addAll(preSelectedItems)
+        _galleryItems.postValue(initialItems)
     }
 
     private fun needToAddFolderView(): Boolean {
