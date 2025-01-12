@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -16,18 +15,14 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModelProvider
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
-import com.mediapicker.gallery.domain.entity.Action
-import com.mediapicker.gallery.domain.entity.Photo
 import com.mediapicker.gallery.domain.entity.PhotoFile
-import com.mediapicker.gallery.domain.entity.Status
-import com.mediapicker.gallery.presentation.activity.FolderViewActivity
 import com.mediapicker.gallery.presentation.adapters.IGalleryItemClickListener
 import com.mediapicker.gallery.presentation.adapters.SelectPhotoImageAdapter
-import com.mediapicker.gallery.presentation.utils.Constants.EXTRA_SELECTED_PHOTO
 import com.mediapicker.gallery.presentation.utils.FileUtils
 import com.mediapicker.gallery.presentation.utils.ValidatePhotos
 import com.mediapicker.gallery.presentation.utils.saveUriToInternalStorage
 import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModel
+import com.mediapicker.gallery.presentation.viewmodels.LoadPhotoViewModelV2
 import java.io.Serializable
 
 private const val TAKING_PHOTO = 9999
@@ -65,10 +60,10 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         return@lazy i
     }
 
-    private val loadPhotoViewModel: LoadPhotoViewModel by lazy {
-        ViewModelProvider(this)[LoadPhotoViewModel::class.java].apply {
-            galleryConfig = Gallery.galleryConfig
-        }
+    private var captureImageUri : Uri? =null
+
+    private val loadPhotoViewModel: LoadPhotoViewModelV2 by lazy {
+        ViewModelProvider(this)[LoadPhotoViewModelV2::class.java]
     }
 
     private val galleryItemAdapter: SelectPhotoImageAdapter by lazy {
@@ -82,22 +77,18 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     private val photoSelectionLauncher =
         registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-            uris.forEach {
-                val file = context?.saveUriToInternalStorage(it)
-                bridgeViewModel.addPhoto(file)
-            }
+            loadPhotoViewModel.addPhotos(uris.mapNotNull { context?.saveUriToInternalStorage(it) })
         }
 
     // Initialize the ActivityResultLauncher for taking a photo
     private var takePhotoLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                if (lastRequestFileToSavePath.isNotEmpty()) {
-                    insertIntoGallery()
+                captureImageUri?.let { uri ->
+                    context?.saveUriToInternalStorage(uri)?.let {
+                        loadPhotoViewModel.addPhotos(listOf(it))
+                    }
                 }
-                // To avoid preselect issue during camera photo click
-                // addItem(getPhoto(lastRequestFileToSavePath))
-                loadPhotoViewModel.loadMedia(this)
             } else {
                 isExpectingNewPhoto = false
             }
@@ -111,14 +102,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
     override fun initViewModels() {
         super.initViewModels()
-        for (listCurrentPhoto in listCurrentPhotos) {
-            loadPhotoViewModel.currentSelectedPhotos.add(listCurrentPhoto)
-        }
-        loadPhotoViewModel.getGalleryItems().observe(this) {
+        loadPhotoViewModel.galleryItems.observe(this) {
             galleryItemAdapter.updateGalleryItems(it)
             onStepValidate()
         }
-        loadPhotoViewModel.loadMedia(this)
+        loadPhotoViewModel.loadData(Gallery.galleryConfig)
     }
 
     private val galleryItemSelectHandler = object :
@@ -147,8 +135,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
         isExpectingNewPhoto = true
         val lastRequestFileToSave = FileUtils.getNewPhotoFileOnPicturesDirectory()
-        val fileUri: Uri
-        fileUri = if (android.text.TextUtils.isEmpty(Gallery.getClientAuthority())) {
+        captureImageUri = if (android.text.TextUtils.isEmpty(Gallery.getClientAuthority())) {
             Uri.fromFile(lastRequestFileToSave)
         } else {
             FileProvider.getUriForFile(
@@ -162,7 +149,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
 
         val pickIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         pickIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        pickIntent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
+        pickIntent.putExtra(MediaStore.EXTRA_OUTPUT, captureImageUri)
 
         val chooserIntent = Intent.createChooser(pickIntent, "Capture new Photo")
         pickIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)

@@ -66,12 +66,7 @@ open class HomeFragment : BaseFragment() {
                     ?: getString(R.string.oss_posting_next)
             isSelected = false
         }
-//        ossFragmentMainBinding?.fullAccessButton?.setOnClickListener {
-//            activity?.let { it1 -> openAppSettings(it1) }
-//        }
-        ossFragmentMainBinding?.button?.setOnClickListener {
-
-        }
+        setUpWithOutTabLayout()
     }
 
     override fun initViewModels() {

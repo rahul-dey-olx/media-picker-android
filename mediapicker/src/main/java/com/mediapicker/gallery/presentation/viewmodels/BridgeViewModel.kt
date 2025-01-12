@@ -1,19 +1,10 @@
 package com.mediapicker.gallery.presentation.viewmodels
 
-import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.mediapicker.gallery.GalleryConfig
 import com.mediapicker.gallery.domain.action.RuleAction
-import com.mediapicker.gallery.domain.entity.Action
-import com.mediapicker.gallery.domain.entity.Photo
 import com.mediapicker.gallery.domain.entity.PhotoFile
-import com.mediapicker.gallery.domain.entity.Status
-import com.mediapicker.gallery.presentation.utils.saveUriToInternalStorage
-import kotlinx.coroutines.launch
-import java.io.File
 
 class BridgeViewModel(
     private var listOfSelectedPhotos: List<PhotoFile>,
@@ -46,26 +37,6 @@ class BridgeViewModel(
     fun setCurrentSelectedPhotos(listOfSelectedPhotos: List<PhotoFile>) {
         this.listOfSelectedPhotos = listOfSelectedPhotos
         shouldEnableActionButton()
-    }
-
-    fun addPhoto(photo: File?) {
-        viewModelScope.launch {
-            if (photo == null)
-                return@launch
-            val selectedPhotos = listOfSelectedPhotos.toMutableList()
-            val imageId = photo.nameWithoutExtension.toLongOrNull() ?: 0L
-            val photoFile = PhotoFile.Builder()
-                .imageId(imageId)
-                .path(photo.path)
-                .smallPhotoUrl("")
-                .photoBackendId(0L)
-                .action(Action.ADD)
-                .status(Status.PENDING)
-                .build()
-            selectedPhotos.add(photoFile)
-            listOfSelectedPhotos = selectedPhotos
-            Log.d("PhotoPicker", "Image added: ${photo.name}")
-        }
     }
 
     fun setCurrentSelectedVideos(listOfSelectedVideos: List<VideoFile>) {
