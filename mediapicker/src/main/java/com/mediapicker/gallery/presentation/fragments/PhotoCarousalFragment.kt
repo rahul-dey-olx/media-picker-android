@@ -105,6 +105,7 @@ open class PhotoCarousalFragment : BaseFragment(), GalleryPagerCommunicator,
             toolbarTitle.gravity = Gallery.galleryConfig.galleryLabels.titleAlignment
             toolbarBackButton.setImageResource(Gallery.galleryConfig.galleryUiConfig.backIcon)
         }
+        setUpWithOutTabLayout()
     }
 
     private fun addMediaForPager(mediaGalleryEntity: MediaGalleryEntity) {
