@@ -80,15 +80,11 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         )
     }
 
-    private var photoSelectionLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val finalSelectionFromFolders =
-                    data?.getSerializableExtra(EXTRA_SELECTED_PHOTO) as? LinkedHashSet<PhotoFile>
-                finalSelectionFromFolders?.let {
-                    setSelectedFromFolderAndNotify(it)
-                }
+    private val photoSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
+            uris.forEach {
+                val file = context?.saveUriToInternalStorage(it)
+                bridgeViewModel.addPhoto(file)
             }
         }
 
@@ -104,14 +100,6 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
                 loadPhotoViewModel.loadMedia(this)
             } else {
                 isExpectingNewPhoto = false
-            }
-        }
-
-    val pickMultipleMedia =
-        registerForActivityResult(ActivityResultContracts.PickMultipleVisualMedia(5)) { uris ->
-            uris.forEach {
-                val file = context?.saveUriToInternalStorage(it)
-                bridgeViewModel.addPhoto(file)
             }
         }
 
@@ -144,7 +132,7 @@ open class PhotoGridFragment : BaseViewPagerItemFragment() {
         override fun onFolderItemClick() {
             //trackingService.postingFolderSelect()
             bridgeViewModel.onFolderSelect()
-            pickMultipleMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            photoSelectionLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
         override fun onCameraIconClick() {
