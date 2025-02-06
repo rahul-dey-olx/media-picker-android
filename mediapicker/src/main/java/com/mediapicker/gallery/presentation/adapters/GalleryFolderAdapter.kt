@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import coil3.load
+import coil3.request.CachePolicy
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssItemFolderSelectionBinding
@@ -66,17 +66,18 @@ class FolderViewHolder(
     }
 
     private fun loadImageIntoView(photo: PhotoFile, imageView: ImageView) {
-        val options = RequestOptions()
         if (photo.isAlreadyUploaded) {
             photo.path?.let {
-                Glide.with(imageView.context).load(photo.fullPhotoUrl).apply(options)
-                    .into(imageView)
+                imageView.load(photo.fullPhotoUrl) {
+                    diskCachePolicy(CachePolicy.ENABLED)
+                }
             }
         } else {
             if (photo.existsPhoto()) {
                 photo.path?.let {
-                    Glide.with(imageView.context).load(Uri.fromFile(File(it))).apply(options)
-                        .into(imageView)
+                    imageView.load(Uri.fromFile(File(it))) {
+                        diskCachePolicy(CachePolicy.ENABLED)
+                    }
                 }
             } else {
                 photo.toString()
