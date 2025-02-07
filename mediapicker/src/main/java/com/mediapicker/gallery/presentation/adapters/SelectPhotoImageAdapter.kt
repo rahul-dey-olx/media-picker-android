@@ -9,9 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
+import coil3.load
+import coil3.request.CachePolicy
 import com.mediapicker.gallery.Gallery
 import com.mediapicker.gallery.R
 import com.mediapicker.gallery.databinding.OssItemCameraSelectionBinding
@@ -199,21 +198,16 @@ class SelectPhotoImageAdapter(
 
 
     private fun loadImageIntoView(photoFile: PhotoFile, imageView: ImageView) {
-        val options = RequestOptions()
-            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .fitCenter()
+
         if (photoFile.isAlreadyUploaded) {
-            Glide.with(imageView.context)
-                .load(photoFile.fullPhotoUrl)
-                .apply(options)
-                .into(imageView)
+            imageView.load(photoFile.fullPhotoUrl) {
+                diskCachePolicy(CachePolicy.ENABLED)
+            }
         } else if (!photoFile.path.isNullOrEmpty()) {
             photoFile.path?.let {
-                Glide.with(imageView.context)
-                    .load(Uri.fromFile(File(it)))
-//                    .thumbnail(0.1f)
-                    .apply(options)
-                    .into(imageView)
+                imageView.load(Uri.fromFile(File(it))) {
+                    diskCachePolicy(CachePolicy.ENABLED)
+                }
             }
         }
     }

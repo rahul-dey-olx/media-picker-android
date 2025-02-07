@@ -16,7 +16,7 @@ import android.widget.ImageView
 import androidx.core.view.ViewCompat
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.bumptech.glide.Glide
+import coil3.load
 import com.github.chrisbanes.photoview.PhotoView
 import com.github.chrisbanes.photoview.PhotoViewAttacher
 import com.mediapicker.gallery.databinding.OssMediaGalleryPagerViewBinding
@@ -276,9 +276,7 @@ open class MediaGalleryPagerView @JvmOverloads constructor(
             } else {
                 img?.let {
                     it.setTag(img?.id ?: 0, media)
-                    Glide.with(context)
-                        .load(imageUrl)
-                        .into(it)
+                    it.load(imageUrl)
                 }
             }
         }
